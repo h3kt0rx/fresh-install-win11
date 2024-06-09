@@ -1941,6 +1941,20 @@ $path = "$env:TEMP\Registry Optimize.reg"
 Regedit.exe /S "$env:TEMP\Registry Optimize.reg"
 Clear-Host
 
+# Wait To Kill Service Timeout
+Write-Host "Changing Wait To Kill Service Timeout..."
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "WaitToKillServiceTimeout" -Type String -Value 100
+
+# Wait to Kill App Timeouts
+Write-Host "Changing Wait To Kill App/Hung Apps/Auto End Tasks Timeout..."
+Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "WaitToKillAppTimeOut" -Type String -Value 100
+Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "HungAppTimeout" -Type String -Value 100
+Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "AutoEndTasks" -Type String -Value 1
+
+# Disable ConfirmFileDelete
+Write-Host "Disable Confirmation to Delete File..."
+Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "ConfirmFileDelete" -Type DWord -Value 1
+
 
 ############################################################################################################################################################
 <# Bloatware #>
@@ -2099,10 +2113,10 @@ Dism /Online /NoRestart /Disable-Feature /FeatureName:Printing-Foundation-Intern
 Dism /Online /NoRestart /Disable-Feature /FeatureName:MSRDC-Infrastructure | Out-Null
 # breaks search
 # Dism /Online /NoRestart /Disable-Feature /FeatureName:SearchEngine-Client-Package | Out-Null
-Dism /Online /NoRestart /Disable-Feature /FeatureName:SMB1Protocol | Out-Null
-Dism /Online /NoRestart /Disable-Feature /FeatureName:SMB1Protocol-Client | Out-Null
-Dism /Online /NoRestart /Disable-Feature /FeatureName:SMB1Protocol-Deprecation | Out-Null
-Dism /Online /NoRestart /Disable-Feature /FeatureName:SmbDirect | Out-Null
+# Dism /Online /NoRestart /Disable-Feature /FeatureName:SMB1Protocol | Out-Null
+# Dism /Online /NoRestart /Disable-Feature /FeatureName:SMB1Protocol-Client | Out-Null
+# Dism /Online /NoRestart /Disable-Feature /FeatureName:SMB1Protocol-Deprecation | Out-Null
+# Dism /Online /NoRestart /Disable-Feature /FeatureName:SmbDirect | Out-Null
 Dism /Online /NoRestart /Disable-Feature /FeatureName:Windows-Identity-Foundation | Out-Null
 Dism /Online /NoRestart /Disable-Feature /FeatureName:MicrosoftWindowsPowerShellV2Root | Out-Null
 Dism /Online /NoRestart /Disable-Feature /FeatureName:MicrosoftWindowsPowerShellV2 | Out-Null
@@ -2394,3 +2408,69 @@ $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 Start-Process $env:C:\Windows\Temp
 # open disk cleanup
 Start-Process cleanmgr.exe #>
+
+<# 
+
+############################################################################################################################################################
+ Remove Bloatware
+############################################################################################################################################################
+
+
+
+Get-AppxPackage -allusers Clipchamp.Clipchamp | Remove-AppxPackage
+Get-AppxPackage -allusers Disney.37853FC22B2CE | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.549981C3F5F10 | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.BingNews | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.BingWeather | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.GetHelp | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.Getstarted | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.MSPaint | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.Microsoft3DViewer | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.MicrosoftOfficeHub | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.MicrosoftSolitaireCollection | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.MicrosoftStickyNotes | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.MixedReality.Portal | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.Office.OneNote | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.OneDriveSync | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.People | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.PowerAutomateDesktop | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.ScreenSketch | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.SkypeApp | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.Todos | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.Wallet | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.WindowsAlarms | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.WindowsCalculator | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.WindowsCamera | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.WindowsFeedbackHub | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.WindowsMaps | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.WindowsSoundRecorder | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.YourPhone | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.ZuneMusic | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.ZuneVideo | Remove-AppxPackage
+Get-AppxPackage -allusers MicrosoftCorporationII.QuickAssist | Remove-AppxPackage
+Get-AppxPackage -allusers MicrosoftTeams | Remove-AppxPackage
+Get-AppxPackage -allusers MicrosoftWindows.Client.WebExperience | Remove-AppxPackage
+Get-AppxPackage -allusers SpotifyAB.SpotifyMusic | Remove-AppxPackage
+Get-AppxPackage -allusers Microsoft.WindowsCommunicationsApps | Remove-AppxPackage
+Get-WindowsPackage -Online | Where PackageName -like *Hello-Face* | Remove-WindowsPackage -Online -NoRestart
+Get-WindowsPackage -Online | Where PackageName -like *QuickAssist* | Remove-WindowsPackage -Online -NoRestart
+
+
+############################################################################################################################################################
+ Personal Programs
+############################################################################################################################################################
+
+
+
+
+Write-Output "Installing Chocolatey"
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+choco install chocolatey-core.extension -y
+Write-Output "Installing Personal Applications"
+choco install 7zip -y
+choco install vlc -y
+choco install notepadplusplus -y
+choco install brave -y
+choco install discord -y
+
+ #>
