@@ -2348,6 +2348,19 @@ Start-Process -wait "$env:TEMP\vcredist2013_x64.exe" -ArgumentList "/passive /no
 Start-Process -wait "$env:TEMP\vcredist2015_2017_2019_2022_x86.exe" -ArgumentList "/passive /norestart"
 Start-Process -wait "$env:TEMP\vcredist2015_2017_2019_2022_x64.exe" -ArgumentList "/passive /norestart"
 
+
+############################################################################################################################################################
+<# Run O&O ShutUp #>
+############################################################################################################################################################
+
+
+$OOSU_filepath = "$ENV:temp\OOSU10.exe"
+$oosu_config = "$ENV:temp\ooshutup10.cfg"
+Invoke-WebRequest -Uri "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" -OutFile $OOSU_filepath
+Invoke-WebRequest -Uri "https://github.com/h3kt0rx/fresh-install-win11/blob/main/cfg/ooshutup10.cfg" -OutFile $oosu_config
+Write-Host "Applying recommended OO Shutup 10 Policies"
+Start-Process $OOSU_filepath -ArgumentList "$oosu_config /quiet" -Wait
+
 ############################################################################################################################################################
 <# Cleanup #>
 ############################################################################################################################################################
