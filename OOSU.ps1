@@ -1,3 +1,12 @@
+# Replace with your Gist's raw URL
+$gistUrl = "https://github.com/h3kt0rx/fresh-install-win11/edit/main/OOSU.ps1"
+
+#Option 1
+#Invoke-RestMethod -Uri $gistUrl | Invoke-Expression
+
+#Option 2
+Invoke-Expression ((New-Object System.net.WebClient).DownloadString('$gistUrl'))
+
 $OOSU_filepath = "$ENV:temp\OOSU10.exe"
 $Initial_ProgressPreference = $ProgressPreference
 $ProgressPreference = "SilentlyContinue" # Disables the Progress Bar to drasticly speed up Invoke-WebRequest
