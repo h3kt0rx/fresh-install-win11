@@ -1,8 +1,5 @@
-# Replace with your Gist's raw URL
-$gistUrl = "https://github.com/h3kt0rx/fresh-install-win11/blob/main/OOSU.ps1"
-
-#Option 1
-Invoke-RestMethod -Uri $gistUrl | Invoke-Expression
+$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/h3kt0rx/fresh-install-win11/main/OOSU.ps1
+Invoke-Expression $($ScriptFromGitHub.Content)
 
 $OOSU_filepath = "$ENV:temp\OOSU10.exe"
 $Initial_ProgressPreference = $ProgressPreference
