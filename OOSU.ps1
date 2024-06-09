@@ -1,5 +1,5 @@
 # Replace with your Gist's raw URL
-$gistUrl = "https://github.com/h3kt0rx/fresh-install-win11/edit/main/OOSU.ps1"
+$gistUrl = "https://github.com/h3kt0rx/fresh-install-win11/blob/main/OOSU.ps1"
 
 #Option 1
 Invoke-RestMethod -Uri $gistUrl | Invoke-Expression
