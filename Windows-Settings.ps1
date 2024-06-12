@@ -2060,10 +2060,12 @@ $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 # open nvidiacontrolpanel
 Start-Process "shell:appsFolder\NVIDIACorp.NVIDIAControlPanel_56jybvy8sckqj!NVIDIACorp.NVIDIAControlPanel"
 
-<# # open temp folder
+<#
+
+# open temp folder
 Start-Process $env:C:\Windows\Temp
 # open disk cleanup
-Start-Process cleanmgr.exe #>
+Start-Process cleanmgr.exe
 
 <# 
 
