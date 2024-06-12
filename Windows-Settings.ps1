@@ -1524,8 +1524,9 @@ Windows Registry Editor Version 5.00
 "EnableAutoTray"=dword:00000000
 
 ; remove security taskbar icon
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run]
-""=hex(3):07,00,00,00,05,DB,8A,69,8A,49,D9,01
+; [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run]
+; ""=hex(3):07,00,00,00,05,DB,8A,69,8A,49,D9,01 
+
 
 ; disable use dynamic lighting on my devices
 [HKEY_CURRENT_USER\Software\Microsoft\Lighting]
