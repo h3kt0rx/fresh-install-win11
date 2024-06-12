@@ -1513,7 +1513,7 @@ Windows Registry Editor Version 5.00
 
 ; remove action center
 [HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer]
-"DisableNotificationCenter"=dword:00000001
+"DisableNotificationCenter"=dword:00000000
 
 ; remove news and interests
 [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds]
@@ -1525,7 +1525,7 @@ Windows Registry Editor Version 5.00
 
 ; remove security taskbar icon
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run]
-"SecurityHealth"=hex(3):07,00,00,00,05,DB,8A,69,8A,49,D9,01
+""=hex(3):07,00,00,00,05,DB,8A,69,8A,49,D9,01
 
 ; disable use dynamic lighting on my devices
 [HKEY_CURRENT_USER\Software\Microsoft\Lighting]
