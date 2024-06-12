@@ -448,8 +448,6 @@ Set-Service -Name "Set Timer Resolution Service" -StartupType Auto -ErrorAction 
 Set-Service -Name "Set Timer Resolution Service" -Status Running -ErrorAction SilentlyContinue | Out-Null
 # fix timer resolution regedit
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "GlobalTimerResolutionRequests" /t REG_DWORD /d "1" /f | Out-Null
-# start taskmanager
-Start-Process taskmgr.exe
 
 
 
@@ -736,8 +734,6 @@ $MultilineComment = @"
 Set-Content -Path "$env:TEMP\Inspector\Inspector.nip" -Value $MultilineComment -Force
 # import config
 Start-Process -wait "$env:TEMP\Inspector\nvidiaProfileInspector.exe" -ArgumentList "$env:TEMP\Inspector\Inspector.nip"
-# open nvidiacontrolpanel
-Start-Process "shell:appsFolder\NVIDIACorp.NVIDIAControlPanel_56jybvy8sckqj!NVIDIACorp.NVIDIAControlPanel"
 
 
 ############################################################################################################################################################
@@ -2061,6 +2057,8 @@ New-Item -Path "$env:C:\Windows" -Name "Temp" -ItemType Directory -ErrorAction S
 
 Write-Host "Restart to apply . . ."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+# open nvidiacontrolpanel
+Start-Process "shell:appsFolder\NVIDIACorp.NVIDIAControlPanel_56jybvy8sckqj!NVIDIACorp.NVIDIAControlPanel"
 
 <# # open temp folder
 Start-Process $env:C:\Windows\Temp
