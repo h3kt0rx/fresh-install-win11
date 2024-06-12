@@ -4,7 +4,19 @@ Copy and Paste the following in Powershell as Administrator:
 Set-ExecutionPolicy Unrestricted
 iwr -useb https://christitus.com/win | iex
 -------------------------------------------------------------------------- #>
+############################################################################################################################################################
+<# Run O&O ShutUp #>
+############################################################################################################################################################
 
+Clear-Host
+Write-Host "Running O&O ShutUp . . ."
+$OOSU_filepath = "$ENV:temp\OOSU10.exe"
+$oosu_config = "$ENV:temp\ooshutup10.cfg"
+Invoke-WebRequest -Uri "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" -OutFile $OOSU_filepath
+Invoke-WebRequest -Uri "https://github.com/h3kt0rx/fresh-install-win11/blob/main/cfg/ooshutup10.cfg" -OutFile $oosu_config
+Write-Host "Applying recommended OO Shutup 10 Policies"
+Start-Process $OOSU_filepath -ArgumentList "$oosu_config /quiet" -Wait
+Clear-Host
 ############################################################################################################################################################
 <# Remove Gamebar #>
 ############################################################################################################################################################
@@ -2016,18 +2028,6 @@ cmd /c "C:\Program Files\7-Zip\7z.exe" x "$env:TEMP\DirectX.exe" -o"$env:TEMP\Di
 Start-Process "$env:TEMP\DirectX\DXSETUP.exe"
 
 
-
-############################################################################################################################################################
-<# Run O&O ShutUp #>
-############################################################################################################################################################
-
-
-$OOSU_filepath = "$ENV:temp\OOSU10.exe"
-$oosu_config = "$ENV:temp\ooshutup10.cfg"
-Invoke-WebRequest -Uri "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" -OutFile $OOSU_filepath
-Invoke-WebRequest -Uri "https://github.com/h3kt0rx/fresh-install-win11/blob/main/cfg/ooshutup10.cfg" -OutFile $oosu_config
-Write-Host "Applying recommended OO Shutup 10 Policies"
-Start-Process $OOSU_filepath -ArgumentList "$oosu_config /quiet" -Wait
 
 ############################################################################################################################################################
 <# Cleanup #>
