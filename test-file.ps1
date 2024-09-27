@@ -1,8 +1,8 @@
 # Define the URL for the DirectX ZIP installer
-$zipUrl = "https://download.microsoft.com/download/8/4/A/84A35BF1-DAFE-4AE8-82AF-AD2AE20B6B14/directx_Jun2010_redist.exe"
+$zipUrl = "https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe"
 
 # Define the paths
-$zipPath = "$env:TEMP\directx_installer.zip"
+$zipPath = "$env:TEMP\directx_installer.exe"
 $extractPath = "$env:TEMP\directx_installer"
 
 # Function to download the file
