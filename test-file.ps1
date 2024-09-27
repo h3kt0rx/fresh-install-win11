@@ -9,7 +9,6 @@ try {
     Invoke-WebRequest -Uri $directxUrl -OutFile $installerPath -ErrorAction Stop
 } catch {
     Write-Host "Failed to download the DirectX installer: $_"
-    exit
 }
 
 # Check if the file exists

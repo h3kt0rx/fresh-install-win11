@@ -94,7 +94,6 @@ function Disable-CoreIsolation {
 Disable-CoreIsolation
 Enable-GameMode
 
-Write-Host "Disable Core Isolation and Enable Game Mode completed."
 
 ############################################################################################################################################################
 <# Run O&O ShutUp #>
