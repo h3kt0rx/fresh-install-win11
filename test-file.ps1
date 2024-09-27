@@ -16,7 +16,7 @@ function Get-FileFromWeb {
         $webClient.DownloadFile($url, $outputPath)
     } catch {
         Write-Host "Failed to download the file: $_"
-        exit
+        Start-Sleep
     }
 }
 
@@ -29,6 +29,8 @@ if (Test-Path $installerPath) {
     Start-Process -FilePath $installerPath -ArgumentList "/install", "/silent" -Wait
     # Optionally, remove the installer after execution
     Remove-Item -Path $installerPath -Force
+    Start-Sleep
 } else {
     Write-Host "The installer was not downloaded successfully."
+    Start-Sleep
 }
