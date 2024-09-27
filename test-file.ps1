@@ -4,12 +4,24 @@ $directxUrl = "https://download.microsoft.com/download/1/8/3/183E4F90-9F52-4E85-
 # Define the path for the downloaded installer
 $installerPath = "$env:TEMP\directx_installer.exe"
 
-# Download the DirectX installer
-try {
-    Invoke-WebRequest -Uri $directxUrl -OutFile $installerPath -ErrorAction Stop
-} catch {
-    Write-Host "Failed to download the DirectX installer: $_"
+# Function to download the file
+function Get-FileFromWeb {
+    param (
+        [string]$url,
+        [string]$outputPath
+    )
+
+    $webClient = New-Object System.Net.WebClient
+    try {
+        $webClient.DownloadFile($url, $outputPath)
+    } catch {
+        Write-Host "Failed to download the file: $_"
+        exit
+    }
 }
+
+# Download the DirectX installer
+Get-FileFromWeb -url $directxUrl -outputPath $installerPath
 
 # Check if the file exists
 if (Test-Path $installerPath) {
