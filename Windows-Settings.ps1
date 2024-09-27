@@ -2061,6 +2061,9 @@ $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 # open nvidiacontrolpanel
 Start-Process "shell:appsFolder\NVIDIACorp.NVIDIAControlPanel_56jybvy8sckqj!NVIDIACorp.NVIDIAControlPanel"
 
+
+Get-AppxPackage -Name "DolbyLaboratories.DolbyAccess" | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+
 <#
 
 # open temp folder
