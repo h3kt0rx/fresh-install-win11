@@ -1,14 +1,14 @@
 # Define the URL for the DirectX installer
-$directxUrl = "https://download.microsoft.com/download/8/4/A/84A35BF1-DAFE-4AE8-82AF-AD2AE20B6B14/directx_Jun2010_redist.exe"
+$directxUrl = "https://download.microsoft.com/download/1/8/3/183E4F90-9F52-4E85-B733-FD13F9B0CE5F/directx_websetup.exe"
 
 # Define the path for the downloaded installer
-$installerPath = "$env:TEMP\directx_installer.exe"
+$installerPath = "$env:TEMP\directx_websetup.exe"
 
 # Download the DirectX installer
 Invoke-WebRequest -Uri $directxUrl -OutFile $installerPath
 
 # Run the installer silently
-Start-Process -FilePath $installerPath -ArgumentList "/silent" -Wait
+Start-Process -FilePath $installerPath -ArgumentList "/install", "/silent" -Wait
 
 # Optionally, remove the installer after execution
 Remove-Item -Path $installerPath -Force
