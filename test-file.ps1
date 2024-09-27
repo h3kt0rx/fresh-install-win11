@@ -1,5 +1,5 @@
 # Define the URL for the DirectX installer
-$directxUrl = "https://download.microsoft.com/download/9/4/5/945A8F9E-18F8-4E1D-9C6B-49C8C4D8E4B6/directx_Jun2010_redist.exe"
+$directxUrl = "https://download.microsoft.com/download/8/4/A/84A35BF1-DAFE-4AE8-82AF-AD2AE20B6B14/directx_Jun2010_redist.exe"
 
 # Define the path for the downloaded installer
 $installerPath = "$env:TEMP\directx_installer.exe"
