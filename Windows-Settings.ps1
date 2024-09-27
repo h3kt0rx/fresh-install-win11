@@ -18,7 +18,7 @@ Set-ItemProperty -Path $UACKey -Name "ConsentPromptBehaviorUser" -Value $UACValu
 Set-ItemProperty -Path $UACKey -Name "EnableLUA" -Value "0"
 
 # Inform user
-Write-Host "UAC has been set to Never Notify. You may need to restart your computer for the changes to take effect."
+Write-Host "UAC has been set to Never Notify."
 
 
 ############################################################################################################################################################
@@ -61,6 +61,7 @@ Set-Location -Path $env:TEMP
 # Clean up
 Remove-Item -Recurse -Force -Path $tempDir
 
+Write-Host "Downloaded and Imported NVIDIA Profile"
 
 ############################################################################################################################################################
 <# Script to Disable Core Isolation and Enable Game Mode #>
@@ -93,7 +94,7 @@ function Disable-CoreIsolation {
 Disable-CoreIsolation
 Enable-GameMode
 
-Write-Host "Optimization completed. Please restart your computer for changes to take effect."
+Write-Host "Disable Core Isolation and Enable Game Mode completed."
 
 ############################################################################################################################################################
 <# Run O&O ShutUp #>
@@ -1867,7 +1868,7 @@ New-Item -Path "$env:C:\Windows" -Name "Temp" -ItemType Directory -ErrorAction S
 Write-Host "Restart to apply . . ."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 # open nvidiacontrolpanel
-Start-Process "shell:appsFolder\NVIDIACorp.NVIDIAControlPanel_56jybvy8sckqj!NVIDIACorp.NVIDIAControlPanel"
+#Start-Process "shell:appsFolder\NVIDIACorp.NVIDIAControlPanel_56jybvy8sckqj!NVIDIACorp.NVIDIAControlPanel"
 
 
 <#
