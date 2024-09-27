@@ -6,6 +6,21 @@ iwr -useb https://christitus.com/win | iex
 --------------------------------------------------------------------------#>
 
 ############################################################################################################################################################
+<# Disable User Account Control (UAC) #>
+############################################################################################################################################################
+
+$UACValue = "0" # 0 = Never Notify
+$UACKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+
+# Set the registry value
+Set-ItemProperty -Path $UACKey -Name "ConsentPromptBehaviorAdmin" -Value $UACValue
+Set-ItemProperty -Path $UACKey -Name "ConsentPromptBehaviorUser" -Value $UACValue
+Set-ItemProperty -Path $UACKey -Name "EnableLUA" -Value "0"
+
+# Inform user
+Write-Host "UAC has been set to Never Notify. You may need to restart your computer for the changes to take effect."
+
+############################################################################################################################################################
 <# Script to Disable Core Isolation and Enable Game Mode #>
 ############################################################################################################################################################
 
@@ -495,7 +510,7 @@ Set-Service -Name "Set Timer Resolution Service" -Status Running -ErrorAction Si
 # fix timer resolution regedit
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "GlobalTimerResolutionRequests" /t REG_DWORD /d "1" /f | Out-Null
 
-
+Clear-Host
 
 ############################################################################################################################################################
 <# NVIDIA Profile #>
