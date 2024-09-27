@@ -20,6 +20,48 @@ Set-ItemProperty -Path $UACKey -Name "EnableLUA" -Value "0"
 # Inform user
 Write-Host "UAC has been set to Never Notify. You may need to restart your computer for the changes to take effect."
 
+
+############################################################################################################################################################
+<# NVIDIA Profile #>
+############################################################################################################################################################
+
+# Define URLs
+$zipUrl = "https://github.com/Orbmu2k/nvidiaProfileInspector/releases/download/2.4.0.4/nvidiaProfileInspector.zip"
+$configUrl = "https://raw.githubusercontent.com/h3kt0rx/fresh-install-win11/refs/heads/main/Base%20Profile.nip"
+
+# Define temporary paths
+$tempDir = "$env:TEMP\nvidiaProfileInspector"
+$zipPath = "$tempDir\nvidiaProfileInspector.zip"
+$extractPath = "$tempDir\nvidiaProfileInspector"
+
+# Create temporary directory
+New-Item -ItemType Directory -Force -Path $tempDir
+
+# Download the ZIP file
+Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+
+# Extract the ZIP file
+Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+
+# Download the configuration file
+Invoke-WebRequest -Uri $configUrl -OutFile "$extractPath\Base Profile.nip"
+
+# Change directory to where the executable is located
+Set-Location -Path $extractPath
+
+# Run the command to import the profile silently
+$process = Start-Process -FilePath ".\nvidiaProfileInspector.exe" -ArgumentList "-silentImport `".\Base Profile.nip`"" -PassThru
+
+# Wait for the process to exit
+$process.WaitForExit()
+
+# Change directory back to a safe location
+Set-Location -Path $env:TEMP
+
+# Clean up
+Remove-Item -Recurse -Force -Path $tempDir
+
+
 ############################################################################################################################################################
 <# Script to Disable Core Isolation and Enable Game Mode #>
 ############################################################################################################################################################
@@ -57,7 +99,7 @@ Write-Host "Optimization completed. Please restart your computer for changes to 
 <# Run O&O ShutUp #>
 ############################################################################################################################################################
 
-Clear-Host
+
 Write-Host "Running O&O ShutUp . . ."
 $OOSU_filepath = "$ENV:temp\OOSU10.exe"
 $oosu_config = "$ENV:temp\ooshutup10.cfg"
@@ -79,10 +121,10 @@ Start-Process $OOSU_filepath -ArgumentList "$oosu_config /quiet" -Wait
     $Host.UI.RawUI.BackgroundColor = "Black"
 	  $Host.PrivateData.ProgressBackgroundColor = "Black"
     $Host.PrivateData.ProgressForegroundColor = "White"
-    Clear-Host
+    
 
 
-Clear-Host
+
 $progresspreference = 'silentlycontinue'
 # disable gamebar regedit
 reg add "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d "0" /f | Out-Null
@@ -109,7 +151,7 @@ Start-Process ms-settings:gaming-gamebar
     $Host.UI.RawUI.BackgroundColor = "Black"
 	  $Host.PrivateData.ProgressBackgroundColor = "Black"
     $Host.PrivateData.ProgressForegroundColor = "White"
-    Clear-Host
+    
 
 
 
@@ -126,10 +168,10 @@ Start-Process ms-settings:gaming-gamebar
     $Host.UI.RawUI.BackgroundColor = "Black"
 	  $Host.PrivateData.ProgressBackgroundColor = "Black"
     $Host.PrivateData.ProgressForegroundColor = "White"
-    Clear-Host
+    
 
 
-Clear-Host
+
 # import ultimate power plan
 cmd /c "powercfg /duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 99999999-9999-9999-9999-999999999999 >nul 2>&1"
 # set ultimate power plan active
@@ -140,7 +182,7 @@ $powerPlans = powercfg /list | Select-String -Pattern "GUID: ([\w-]+)" | ForEach
 foreach ($plan in $powerPlans) {
 powercfg -delete $plan
 }
-Clear-Host
+
 # disable hibernate
 powercfg /hibernate off
 cmd /c "reg add `"HKLM\SYSTEM\CurrentControlSet\Control\Power`" /v `"HibernateEnabled`" /t REG_DWORD /d `"0`" /f >nul 2>&1"
@@ -221,24 +263,24 @@ powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 9596fb26-9850-41f
 # MODIFY LAPTOP SETTINGS
 # intel(r) graphics settings intel(r) graphics power plan maximum performance
 powercfg /setacvalueindex 99999999-9999-9999-9999-999999999999 44f3beca-a7c0-460e-9df2-bb8b99e0cba6 3619c3f2-afb2-4afc-b0e9-e7fef372de36 002
-Clear-Host
+
 powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 44f3beca-a7c0-460e-9df2-bb8b99e0cba6 3619c3f2-afb2-4afc-b0e9-e7fef372de36 002
-Clear-Host
+
 # amd power slider overlay best performance
 powercfg /setacvalueindex 99999999-9999-9999-9999-999999999999 c763b4ec-0e50-4b6b-9bed-2b92a6ee884e 7ec1751b-60ed-4588-afb5-9819d3d77d90 003
-Clear-Host
+
 powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 c763b4ec-0e50-4b6b-9bed-2b92a6ee884e 7ec1751b-60ed-4588-afb5-9819d3d77d90 003
-Clear-Host
+
 # ati graphics power settings ati powerplay settings maximize performance
 powercfg /setacvalueindex 99999999-9999-9999-9999-999999999999 f693fb01-e858-4f00-b20f-f30e12ac06d6 191f65b5-d45c-4a4f-8aae-1ab8bfd980e6 001
-Clear-Host
+
 powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 f693fb01-e858-4f00-b20f-f30e12ac06d6 191f65b5-d45c-4a4f-8aae-1ab8bfd980e6 001
-Clear-Host
+
 # switchable dynamic graphics global settings maximize performance
 powercfg /setacvalueindex 99999999-9999-9999-9999-999999999999 e276e160-7cb0-43c6-b20b-73f5dce39954 a1662ab2-9d34-4e53-ba8b-2639b9e20857 003
-Clear-Host
+
 powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 e276e160-7cb0-43c6-b20b-73f5dce39954 a1662ab2-9d34-4e53-ba8b-2639b9e20857 003
-Clear-Host
+
 # battery
 # critical battery notification off
 powercfg /setacvalueindex 99999999-9999-9999-9999-999999999999 e73a048d-bf27-4f12-9731-8b2076e8891f 5dbb7c9f-38e9-40d2-9749-4f8a0e9f640f 000
@@ -264,15 +306,15 @@ powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 e73a048d-bf27-4f1
 # immersive control panel
 # low screen brightness when using battery saver disable
 powercfg /setacvalueindex 99999999-9999-9999-9999-999999999999 de830923-a562-41af-a086-e3a2c6bad2da 13d09884-f74e-474a-a852-b6bde8ad03a8 0x00000064
-Clear-Host
+
 powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 de830923-a562-41af-a086-e3a2c6bad2da 13d09884-f74e-474a-a852-b6bde8ad03a8 0x00000064
-Clear-Host
+
 # immersive control panel
 # turn battery saver on automatically at never
 powercfg /setacvalueindex 99999999-9999-9999-9999-999999999999 de830923-a562-41af-a086-e3a2c6bad2da e69653ca-cf7f-4f05-aa73-cb833fa90ad4 0x00000000
-Clear-Host
+
 powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 de830923-a562-41af-a086-e3a2c6bad2da e69653ca-cf7f-4f05-aa73-cb833fa90ad4 0x00000000
-Clear-Host
+
 
 <# # open settings
 Start-Process powercfg.cpl #>
@@ -295,10 +337,10 @@ Start-Process powercfg.cpl #>
     $Host.UI.RawUI.BackgroundColor = "Black"
 	$Host.PrivateData.ProgressBackgroundColor = "Black"
     $Host.PrivateData.ProgressForegroundColor = "White"
-    Clear-Host
+    
 
 
-Clear-Host
+
 Write-Host "Installing: Set Timer Resolution Service . . ."
 # create .cs file
 $MultilineComment = @"
@@ -510,47 +552,8 @@ Set-Service -Name "Set Timer Resolution Service" -Status Running -ErrorAction Si
 # fix timer resolution regedit
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "GlobalTimerResolutionRequests" /t REG_DWORD /d "1" /f | Out-Null
 
-Clear-Host
 
-############################################################################################################################################################
-<# NVIDIA Profile #>
-############################################################################################################################################################
 
-# Define URLs
-$zipUrl = "https://github.com/Orbmu2k/nvidiaProfileInspector/releases/download/2.4.0.4/nvidiaProfileInspector.zip"
-$configUrl = "https://raw.githubusercontent.com/h3kt0rx/fresh-install-win11/refs/heads/main/Base%20Profile.nip"
-
-# Define temporary paths
-$tempDir = "$env:TEMP\nvidiaProfileInspector"
-$zipPath = "$tempDir\nvidiaProfileInspector.zip"
-$extractPath = "$tempDir\nvidiaProfileInspector"
-
-# Create temporary directory
-New-Item -ItemType Directory -Force -Path $tempDir
-
-# Download the ZIP file
-Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
-
-# Extract the ZIP file
-Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
-
-# Download the configuration file
-Invoke-WebRequest -Uri $configUrl -OutFile "$extractPath\Base Profile.nip"
-
-# Change directory to where the executable is located
-Set-Location -Path $extractPath
-
-# Run the command to import the profile silently
-$process = Start-Process -FilePath ".\nvidiaProfileInspector.exe" -ArgumentList "-silentImport `".\Base Profile.nip`"" -PassThru
-
-# Wait for the process to exit
-$process.WaitForExit()
-
-# Change directory back to a safe location
-Set-Location -Path $env:TEMP
-
-# Clean up
-Remove-Item -Recurse -Force -Path $tempDir
 
 
 ############################################################################################################################################################
@@ -569,10 +572,10 @@ Remove-Item -Recurse -Force -Path $tempDir
     $Host.UI.RawUI.BackgroundColor = "Black"
 	$Host.PrivateData.ProgressBackgroundColor = "Black"
     $Host.PrivateData.ProgressForegroundColor = "White"
-    Clear-Host
+    
 
 
-Clear-Host
+
 Write-Host "Registry: Optimize . . ."
 # create reg file
 $MultilineComment = @"
@@ -1674,7 +1677,7 @@ $path = "$env:TEMP\Registry Optimize.reg"
 (Get-Content $path) -replace "\?","$" | Out-File $path
 # import reg file
 Regedit.exe /S "$env:TEMP\Registry Optimize.reg"
-Clear-Host
+
 <#
 # Wait To Kill Service Timeout
 Write-Host "Changing Wait To Kill Service Timeout..."
@@ -1707,7 +1710,7 @@ Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies
     $Host.UI.RawUI.BackgroundColor = "Black"
 	  $Host.PrivateData.ProgressBackgroundColor = "Black"
     $Host.PrivateData.ProgressForegroundColor = "White"
-    Clear-Host
+    
 
     function Get-FileFromWeb {
     param ([Parameter(Mandatory)][string]$URL, [Parameter(Mandatory)][string]$File)
@@ -1785,7 +1788,7 @@ Start-Process -wait "$env:TEMP\vcredist2015_2017_2019_2022_x64.exe" -ArgumentLis
     $Host.UI.RawUI.BackgroundColor = "Black"
 	  $Host.PrivateData.ProgressBackgroundColor = "Black"
     $Host.PrivateData.ProgressForegroundColor = "White"
-    Clear-Host
+    
 
     function Get-FileFromWeb {
     param ([Parameter(Mandatory)][string]$URL, [Parameter(Mandatory)][string]$File)
@@ -1850,7 +1853,7 @@ Start-Process "$env:TEMP\DirectX\DXSETUP.exe"
     $Host.UI.RawUI.BackgroundColor = "Black"
 	  $Host.PrivateData.ProgressBackgroundColor = "Black"
     $Host.PrivateData.ProgressForegroundColor = "White"
-    Clear-Host
+    
 
 # clear %temp% folder
 Remove-Item -Path "$env:USERPROFILE\AppData\Local\Temp" -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
