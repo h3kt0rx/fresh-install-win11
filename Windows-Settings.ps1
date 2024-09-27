@@ -4,6 +4,40 @@ Copy and Paste the following in Powershell as Administrator:
 Set-ExecutionPolicy Unrestricted
 iwr -useb https://christitus.com/win | iex
 --------------------------------------------------------------------------#>
+
+############################################################################################################################################################
+<# Script to Disable Core Isolation and Enable Game Mode #>
+############################################################################################################################################################
+
+# Function to Enable Game Mode
+function Enable-GameMode {
+    $gameModePath = "HKLM:\SOFTWARE\Microsoft\GameBar"
+    if (-not (Test-Path $gameModePath)) {
+        New-Item -Path $gameModePath -Force
+    }
+    Set-ItemProperty -Path $gameModePath -Name "AllowGameBar" -Value 1 -ErrorAction SilentlyContinue
+    Write-Host "Game Mode has been enabled."
+}
+
+# Function to Disable Core Isolation Memory Integrity
+function Disable-CoreIsolation {
+    $memoryIntegrityPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeviceGuard"
+    
+    if (-not (Test-Path $memoryIntegrityPath)) {
+        New-Item -Path $memoryIntegrityPath -Force
+    }
+
+    # Set Memory Integrity to disabled
+    Set-ItemProperty -Path $memoryIntegrityPath -Name "EnableVirtualizationBasedSecurity" -Value 0 -ErrorAction SilentlyContinue
+    Write-Host "Core Isolation Memory Integrity has been disabled."
+}
+
+# Execute Optimization Functions
+Disable-CoreIsolation
+Enable-GameMode
+
+Write-Host "Optimization completed. Please restart your computer for changes to take effect."
+
 ############################################################################################################################################################
 <# Run O&O ShutUp #>
 ############################################################################################################################################################
@@ -13,7 +47,7 @@ Write-Host "Running O&O ShutUp . . ."
 $OOSU_filepath = "$ENV:temp\OOSU10.exe"
 $oosu_config = "$ENV:temp\ooshutup10.cfg"
 Invoke-WebRequest -Uri "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe" -OutFile $OOSU_filepath
-Invoke-WebRequest -Uri "https://github.com/h3kt0rx/fresh-install-win11/blob/main/cfg/ooshutup10.cfg" -OutFile $oosu_config
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/h3kt0rx/fresh-install-win11/bcd88675cbdc59d3af7cc6fc6b5ca8430840e7ce/cfg/ooshutup10.cfg" -OutFile $oosu_config
 Write-Host "Applying personal O&O Shutup 10 Policies"
 Start-Process $OOSU_filepath -ArgumentList "$oosu_config /quiet" -Wait
 Clear-Host
