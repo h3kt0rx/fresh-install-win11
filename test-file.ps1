@@ -16,19 +16,27 @@ function Get-FileFromWeb {
         $webClient.DownloadFile($url, $outputPath)
     } catch {
         Write-Host "Failed to download the file: $_"
-        exit
+        return $false
     }
+    return $true
 }
 
 # Download the DirectX installer
-Get-FileFromWeb -url $directxUrl -outputPath $installerPath
-
-# Check if the file exists
-if (Test-Path $installerPath) {
-    # Run the installer silently
-    Start-Process -FilePath $installerPath -ArgumentList "/silent" -Wait
-    # Optionally, remove the installer after execution
-    Remove-Item -Path $installerPath -Force
+if (Get-FileFromWeb -url $directxUrl -outputPath $installerPath) {
+    # Check if the file exists
+    if (Test-Path $installerPath) {
+        # Run the installer silently
+        try {
+            Start-Process -FilePath $installerPath -ArgumentList "/silent" -Wait -ErrorAction Stop
+        } catch {
+            Write-Host "Failed to run the installer: $_"
+        }
+        
+        # Optionally, remove the installer after execution
+        Remove-Item -Path $installerPath -Force
+    } else {
+        Write-Host "The installer was not downloaded successfully."
+    }
 } else {
-    Write-Host "The installer was not downloaded successfully."
+    Write-Host "Download process failed."
 }
