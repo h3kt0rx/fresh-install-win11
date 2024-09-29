@@ -1,5 +1,5 @@
 # Define the URL for the DirectX installer
-$directXUrl = "https://download.microsoft.com/download/3/2/B/32B20E71-0676-4B39-B07D-447A5E8E6A49/dxwebsetup.exe"
+$directXUrl = "https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe"
 
 # Define the temporary directory
 $tempDir = [System.IO.Path]::GetTempPath()
