@@ -1,20 +1,20 @@
-# Define the URL for the DirectX installer
-$directxUrl = "https://download.microsoft.com/download/1/1C/1C1E1C1E-1C1E-1C1E-1C1E-1C1E1C1E1C1E/directx_Jun2010_redist.exe"
+$FileUri = "https://download.microsoft.com/download/8/4/A/84A35BF1-DAFE-4AE8-82AF-AD2AE20B6B14/directx_Jun2010_redist.exe"
+$Destination = $env:TEMP
 
-# Create a temporary directory
-$tempDir = New-Item -ItemType Directory -Path "$env:TEMP\DirectXTemp" -Force
+$bitsJobObj = Start-BitsTransfer $FileUri -Destination $Destination
 
-# Define the path for the downloaded installer
-$installerPath = "$tempDir\directx_Jun2010_redist.exe"
+switch ($bitsJobObj.JobState) {
 
-# Download the DirectX installer
-Invoke-WebRequest -Uri $directxUrl -OutFile $installerPath
+    'Transferred' {
+        Complete-BitsTransfer -BitsJob $bitsJobObj
+        break
+    }
 
-# Extract the installer files to the temporary directory
-Start-Process -FilePath $installerPath -ArgumentList "/Q /T:$tempDir" -Wait
+    'Error' {
+        throw 'Error downloading'
+    }
+}
 
-# Run the DirectX setup silently
-Start-Process -FilePath "$tempDir\DXSETUP.exe" -ArgumentList "/silent" -Wait
+$exeArgs = '/silent'
 
-# Clean up the temporary directory
-Remove-Item -Path $tempDir -Recurse -Force
+Start-Process -Wait $Destination -ArgumentList $exeArgs
