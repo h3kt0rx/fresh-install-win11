@@ -1,15 +1,20 @@
 # Define the URL for the DirectX installer
-$directXUrl = "https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe"
+$directxUrl = "https://download.microsoft.com/download/1/1C/1C1E1C1E-1C1E-1C1E-1C1E-1C1E1C1E1C1E/directx_Jun2010_redist.exe"
 
-# Define the temporary directory
-$tempDir = [System.IO.Path]::GetTempPath()
-$installerPath = Join-Path -Path $tempDir -ChildPath "dxwebsetup.exe"
+# Create a temporary directory
+$tempDir = New-Item -ItemType Directory -Path "$env:TEMP\DirectXTemp" -Force
+
+# Define the path for the downloaded installer
+$installerPath = "$tempDir\directx_Jun2010_redist.exe"
 
 # Download the DirectX installer
-Invoke-WebRequest -Uri $directXUrl -OutFile $installerPath
+Invoke-WebRequest -Uri $directxUrl -OutFile $installerPath
 
-# Start the installer silently in the background
-Start-Process -FilePath $installerPath -ArgumentList "/silent" -NoNewWindow -Wait
+# Extract the installer files to the temporary directory
+Start-Process -FilePath $installerPath -ArgumentList "/Q /T:$tempDir" -Wait
 
-# Optionally, you can delete the installer after installation
-Remove-Item -Path $installerPath -Force
+# Run the DirectX setup silently
+Start-Process -FilePath "$tempDir\DXSETUP.exe" -ArgumentList "/silent" -Wait
+
+# Clean up the temporary directory
+Remove-Item -Path $tempDir -Recurse -Force
