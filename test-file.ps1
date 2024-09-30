@@ -1,3 +1,26 @@
+# Define the TEMP folder path
+$tempFolder = $env:TEMP
+
+# Check if the TEMP folder exists
+if (Test-Path -Path $tempFolder) {
+    # Get all files and directories in the TEMP folder
+    $items = Get-ChildItem -Path $tempFolder -Recurse -Force
+
+    # Remove all items
+    foreach ($item in $items) {
+        try {
+            Remove-Item -Path $item.FullName -Recurse -Force -ErrorAction Stop
+            Write-Host "Removed: $($item.FullName)"
+        } catch {
+            Write-Host "Failed to remove: $($item.FullName) - $_"
+        }
+    }
+    
+    Write-Host "Cleanup of $tempFolder completed."
+} else {
+    Write-Host "The TEMP folder does not exist."
+}
+
 # Define the URL and paths
 $FileUri = "https://download.microsoft.com/download/8/4/A/84A35BF1-DAFE-4AE8-82AF-AD2AE20B6B14/directx_Jun2010_redist.exe"
 $FileUri2 = "https://www.7-zip.org/a/7z2301-x64.exe"
