@@ -1808,7 +1808,7 @@ Start-Process -wait "$env:TEMP\7-Zip.exe" /S
 # extract files with 7zip
 cmd /c "C:\Program Files\7-Zip\7z.exe" x "$Destination" -o"$ExtractPath" -y | Out-Null
 # install direct x
-Start-Process "$ExtractPath\DXSETUP.exe" -ArgumentList "/install"
+Start-Process "$ExtractPath\DXSETUP.exe" -ArgumentList "/silent"
 
 # Clean up the installer
 Remove-Item -Path $Destination -Force
