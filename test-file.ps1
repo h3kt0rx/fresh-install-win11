@@ -15,6 +15,5 @@ switch ($bitsJobObj.JobState) {
     }
 }
 
-$exeArgs = '/silent'
 
-Start-Process -Wait $Destination -ArgumentList $exeArgs
+Start-Process -Wait $Destination -ArgumentList "/slient"
