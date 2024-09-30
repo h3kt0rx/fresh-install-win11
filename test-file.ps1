@@ -16,4 +16,4 @@ switch ($bitsJobObj.JobState) {
 }
 
 
-Start-Process -Wait $Destination -ArgumentList "/Q"
+Start-Process -Wait $Destination -ArgumentList "/C /T"
