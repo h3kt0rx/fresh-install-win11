@@ -16,4 +16,4 @@ switch ($bitsJobObj.JobState) {
 }
 
 
-Start-Process -Wait $Destination -ArgumentList "/slient"
+Start-Process -Wait $Destination -ArgumentList "/install"
