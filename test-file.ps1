@@ -1,7 +1,7 @@
 # Define the URL and paths
-$FileUri = "https://download.microsoft.com/download/8/4/A/84A35BF1-DAFE-4AE8-82AF-AD2AE20B6B14/dxwebsetup.exe"
+$FileUri = "https://download.microsoft.com/download/8/4/A/84A35BF1-DAFE-4AE8-82AF-AD2AE20B6B14/directx_Jun2010_redist.exe"
 $FileUri2 = "https://www.7-zip.org/a/7z2301-x64.exe"
-$Destination = "$env:TEMP\dxwebsetup.exe"
+$Destination = "$env:TEMP\directx_Jun2010_redist.exe"
 $Destination2 = "$env:TEMP\7-Zip.exe"
 $ExtractPath = "$env:TEMP\DirectX_Install"
 
