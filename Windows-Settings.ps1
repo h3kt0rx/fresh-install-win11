@@ -1478,9 +1478,9 @@ E0,F6,C5,D5,0E,CA,50,00,00
 [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\StorageSense]
 "AllowStorageSenseGlobal"=dword:00000000
 
-; disable snap windows
+; enable snap windows
 [HKEY_CURRENT_USER\Control Panel\Desktop]
-"WindowArrangementActive"="0"
+"WindowArrangementActive"="1"
 
 ; alt tab open windows only
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
