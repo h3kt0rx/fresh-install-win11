@@ -4,6 +4,25 @@ Copy and Paste the following in Powershell as Administrator:
 Set-ExecutionPolicy Unrestricted
 iwr -useb https://christitus.com/win | iex
 --------------------------------------------------------------------------#>
+############################################################################################################################################################
+<# Check if the script is running as Administrator #>
+############################################################################################################################################################
+
+$principal = [Security.Principal.WindowsPrincipal]([Security.Principal.WindowsIdentity]::GetCurrent())
+if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    # Restart the script with Administrator privileges
+    Start-Process PowerShell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+    Exit
+}
+
+# Set window title for the Administrator session
+$Host.UI.RawUI.WindowTitle = "$($myInvocation.MyCommand.Definition) (Administrator)"
+
+# Customize console appearance
+$Host.UI.RawUI.BackgroundColor = "Black"
+$Host.PrivateData.ProgressBackgroundColor = "Black"
+$Host.PrivateData.ProgressForegroundColor = "White"
+
 
 ############################################################################################################################################################
 <# Disable User Account Control (UAC) #>
@@ -79,8 +98,6 @@ function Enable-GameMode {
     # Set or create properties
     New-ItemProperty -Path $gameModePath -Name "AutoGameModeEnabled" -Value 1 -PropertyType DWord -Force
     New-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -PropertyType DWord -Force
-    
-    Write-Host "Game Mode has been enabled."
 }
 
 # Function to Disable Core Isolation Memory Integrity
@@ -93,12 +110,13 @@ function Disable-CoreIsolation {
 
     # Set Memory Integrity to disabled
     Set-ItemProperty -Path $memoryIntegrityPath -Name "EnableVirtualizationBasedSecurity" -Value 0 -ErrorAction SilentlyContinue
-    Write-Host "Core Isolation Memory Integrity has been disabled."
 }
 
 # Execute Optimization Functions
 Disable-CoreIsolation
 Enable-GameMode
+Write-Host "Game Mode has been enabled."
+Write-Host "Core Isolation Memory Integrity has been disabled."
 
 
 ############################################################################################################################################################
@@ -119,18 +137,6 @@ Start-Process $OOSU_filepath -ArgumentList "$oosu_config /quiet" -Wait
 ############################################################################################################################################################
 
 
-
-    If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator"))
-    {Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-    Exit}
-    $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + " (Administrator)"
-    $Host.UI.RawUI.BackgroundColor = "Black"
-	  $Host.PrivateData.ProgressBackgroundColor = "Black"
-    $Host.PrivateData.ProgressForegroundColor = "White"
-    
-
-
-
 $progresspreference = 'silentlycontinue'
 # disable gamebar regedit
 reg add "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d "0" /f | Out-Null
@@ -140,7 +146,7 @@ Stop-Process -Force -Name GameBar -ErrorAction SilentlyContinue | Out-Null
 # uninstall gamebar
 Get-AppxPackage -allusers *Microsoft.XboxGameOverlay* | Remove-AppxPackage
 Get-AppxPackage -allusers *Microsoft.XboxGamingOverlay* | Remove-AppxPackage
-Start-Process ms-settings:gaming-gamebar
+
 
 
 ############################################################################################################################################################
@@ -150,62 +156,65 @@ Start-Process ms-settings:gaming-gamebar
 
 
 
-    If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator"))
-    {Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-    Exit}
-    $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + " (Administrator)"
-    $Host.UI.RawUI.BackgroundColor = "Black"
-	  $Host.PrivateData.ProgressBackgroundColor = "Black"
-    $Host.PrivateData.ProgressForegroundColor = "White"
-    
-
-
-
 
 ############################################################################################################################################################
 <# Powerplan #>
 ############################################################################################################################################################
 
 
-    If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator"))
-    {Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-    Exit}
-    $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + " (Administrator)"
-    $Host.UI.RawUI.BackgroundColor = "Black"
-	  $Host.PrivateData.ProgressBackgroundColor = "Black"
-    $Host.PrivateData.ProgressForegroundColor = "White"
-    
+# Duplicate the ultimate power plan
+$sourcePlan = "e9a42b02-d5df-448d-aa00-03f14749eb61"
+$targetPlan = "99999999-9999-9999-9999-999999999999"
+cmd /c "powercfg /duplicatescheme $sourcePlan $targetPlan >nul 2>&1"
 
+# Set the ultimate power plan as active
+cmd /c "powercfg /SETACTIVE $targetPlan >nul 2>&1"
 
+# Get the currently active power scheme
+$activePlan = powercfg /getactivescheme | Select-String -Pattern "GUID: ([\w-]+)" | ForEach-Object { $_.Matches.Groups[1].Value }
 
-# import ultimate power plan
-cmd /c "powercfg /duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 99999999-9999-9999-9999-999999999999 >nul 2>&1"
-# set ultimate power plan active
-cmd /c "powercfg /SETACTIVE 99999999-9999-9999-9999-999999999999 >nul 2>&1"
-# get all powerplans
+# Retrieve all power plans
 $powerPlans = powercfg /list | Select-String -Pattern "GUID: ([\w-]+)" | ForEach-Object { $_.Matches.Groups[1].Value }
-# delete all powerplans
+
+# Delete all power plans except the active one
 foreach ($plan in $powerPlans) {
-powercfg -delete $plan
+    if ($plan -ne $activePlan) {
+        powercfg -delete $plan
+    }
 }
 
-# disable hibernate
+# Disable hibernate
 powercfg /hibernate off
-cmd /c "reg add `"HKLM\SYSTEM\CurrentControlSet\Control\Power`" /v `"HibernateEnabled`" /t REG_DWORD /d `"0`" /f >nul 2>&1"
-cmd /c "reg add `"HKLM\SYSTEM\CurrentControlSet\Control\Power`" /v `"HibernateEnabledDefault`" /t REG_DWORD /d `"0`" /f >nul 2>&1"
-# disable lock
-cmd /c "reg add `"HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings`" /v `"ShowLockOption`" /t REG_DWORD /d `"0`" /f >nul 2>&1"
-# disable sleep
-cmd /c "reg add `"HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings`" /v `"ShowSleepOption`" /t REG_DWORD /d `"0`" /f >nul 2>&1"
-# disable fast boot
-cmd /c "reg add `"HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power`" /v `"HiberbootEnabled`" /t REG_DWORD /d `"0`" /f >nul 2>&1"
-# unpark cpu cores
-cmd /c "reg add `"HKLM\SYSTEM\ControlSet001\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\0cc5b647-c1df-4637-891a-dec35c318583`" /v `"ValueMax`" /t REG_DWORD /d `"0`" /f >nul 2>&1"
-# disable power throttling
-cmd /c "reg add `"HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling`" /v `"PowerThrottlingOff`" /t REG_DWORD /d `"1`" /f >nul 2>&1"
-# optimization system responsiveness
-cmd /c "reg add `"HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile`" /v `"SystemResponsiveness`" /t REG_DWORD /d `"0`" /f >nul 2>&1"
-# MODIFY DESKTOP & LAPTOP SETTINGS
+
+# Disable hibernate settings in the registry
+$regPath1 = "HKLM:\SYSTEM\CurrentControlSet\Control\Power"
+Set-ItemProperty -Path $regPath1 -Name "HibernateEnabled" -Value 0 -Type DWord -Force
+Set-ItemProperty -Path $regPath1 -Name "HibernateEnabledDefault" -Value 0 -Type DWord -Force
+
+# Disable lock option in the registry
+$regPath2 = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings"
+Set-ItemProperty -Path $regPath2 -Name "ShowLockOption" -Value 0 -Type DWord -Force
+
+# Disable sleep option in the registry
+Set-ItemProperty -Path $regPath2 -Name "ShowSleepOption" -Value 0 -Type DWord -Force
+
+# Disable fast boot
+$regPath3 = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power"
+Set-ItemProperty -Path $regPath3 -Name "HiberbootEnabled" -Value 0 -Type DWord -Force
+
+# Unpark CPU cores
+$cpuCoresRegPath = "HKLM:\SYSTEM\ControlSet001\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\0cc5b647-c1df-4637-891a-dec35c318583"
+Set-ItemProperty -Path $cpuCoresRegPath -Name "ValueMax" -Value 0 -Type DWord -Force
+
+# Disable power throttling
+$throttlingRegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling"
+Set-ItemProperty -Path $throttlingRegPath -Name "PowerThrottlingOff" -Value 1 -Type DWord -Force
+
+# Optimize system responsiveness
+$systemProfileRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"
+Set-ItemProperty -Path $systemProfileRegPath -Name "SystemResponsiveness" -Value 0 -Type DWord -Force
+
+
 # hard disk turn off hard disk after 0%
 powercfg /setacvalueindex 99999999-9999-9999-9999-999999999999 0012ee47-9041-4b5d-9b77-535fba8b1442 6738e2c4-e8a5-4a42-b16a-e040e769756e 0x00000000
 powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 0012ee47-9041-4b5d-9b77-535fba8b1442 6738e2c4-e8a5-4a42-b16a-e040e769756e 0x00000000
@@ -322,29 +331,9 @@ powercfg /setacvalueindex 99999999-9999-9999-9999-999999999999 de830923-a562-41a
 powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 de830923-a562-41af-a086-e3a2c6bad2da e69653ca-cf7f-4f05-aa73-cb833fa90ad4 0x00000000
 
 
-<# # open settings
-Start-Process powercfg.cpl #>
-
-
-
 ############################################################################################################################################################
 <# Timer Resolution #>
 ############################################################################################################################################################
-
-
-
-
-
-
-    If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator"))
-    {Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-    Exit}
-    $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + " (Administrator)"
-    $Host.UI.RawUI.BackgroundColor = "Black"
-	$Host.PrivateData.ProgressBackgroundColor = "Black"
-    $Host.PrivateData.ProgressForegroundColor = "White"
-    
-
 
 
 Write-Host "Installing: Set Timer Resolution Service . . ."
@@ -565,21 +554,6 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "Globa
 ############################################################################################################################################################
 <# Registry #>
 ############################################################################################################################################################
-
-
-
-
-
-
-    If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator"))
-    {Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-    Exit}
-    $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + " (Administrator)"
-    $Host.UI.RawUI.BackgroundColor = "Black"
-	$Host.PrivateData.ProgressBackgroundColor = "Black"
-    $Host.PrivateData.ProgressForegroundColor = "White"
-    
-
 
 
 Write-Host "Registry: Optimize . . ."
