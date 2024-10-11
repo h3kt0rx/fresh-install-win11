@@ -132,10 +132,17 @@ Start-Process $OOSU_filepath -ArgumentList "$oosu_config /quiet" -Wait
 ############################################################################################################################################################
 
 
-$progresspreference = 'silentlycontinue'
-# disable gamebar regedit
-reg add "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d "0" /f | Out-Null
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "AppCaptureEnabled" /t REG_DWORD /d "0" /f | Out-Null
+# Define registry paths and values
+$values = @{
+    "HKCU:\System\GameConfigStore" = "GameDVR_Enabled"
+    "HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR" = "AppCaptureEnabled"
+}
+
+foreach ($path in $values.Keys) {
+    $name = $values[$path]
+    if (-not (Test-Path "$path\$name")) { New-Item -Path $path -Force }
+    Set-ItemProperty -Path $path -Name $name -Value 0 -Type DWord
+}
 # stop gamebar running
 Stop-Process -Force -Name GameBar -ErrorAction SilentlyContinue | Out-Null
 # uninstall gamebar
