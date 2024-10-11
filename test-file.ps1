@@ -5,7 +5,7 @@ function Enable-GameMode {
         New-Item -Path $gameModePath -Force
     }
     Set-ItemProperty -Path $gameModePath -Name "AutoGameModeEnabled" -Value 1 -ErrorAction SilentlyContinue
-    Set-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -ErrorAction SilentlyContinue
+#    Set-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -ErrorAction SilentlyContinue
     Write-Host "Game Mode has been enabled."
 }
 
