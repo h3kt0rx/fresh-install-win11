@@ -12,29 +12,23 @@ $zipPath = "$tempDir\nvidiaProfileInspector.zip"
 $extractPath = "$tempDir\nvidiaProfileInspector"
 
 # Create the directory and suppress output
-New-Item -ItemType Directory -Force -Path $tempDir
+New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
 
 # Download the ZIP file and suppress output
-Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath | Out-Null
 
 # Extract the ZIP file and suppress output
-Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force | Out-Null
 
 # Download the configuration file and suppress output
-Invoke-WebRequest -Uri $configUrl -OutFile "$extractPath\Base Profile.nip"
+Invoke-WebRequest -Uri $configUrl -OutFile "$extractPath\Base Profile.nip" | Out-Null
 
-
-# Change directory to where the executable is located
-#Set-Location -Path $extractPath | Out-Null
 
 # Run the command to import the profile silently
-$process = Start-Process -FilePath $extractPath\nvidiaProfileInspector.exe -ArgumentList "-silentImport `".\Base Profile.nip`"" -PassThru
+$process = Start-Process -FilePath $extractPath\nvidiaProfileInspector.exe -ArgumentList "-silentImport `"$extractPath\Base Profile.nip`"" -PassThru
 
 # Wait for the process to exit
 $process.WaitForExit()
-
-# Change directory back to a safe location
-#Set-Location -Path $env:TEMP
 
 # Clean up
 Remove-Item -Recurse -Force -Path $tempDir
