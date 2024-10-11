@@ -66,17 +66,11 @@ Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force | Out-Null
 Invoke-WebRequest -Uri $configUrl -OutFile "$extractPath\Base Profile.nip" | Out-Null
 
 
-# Change directory to where the executable is located
-Set-Location -Path $extractPath | Out-Null
-
 # Run the command to import the profile silently
-$process = Start-Process -FilePath ".\nvidiaProfileInspector.exe" -ArgumentList "-silentImport `".\Base Profile.nip`"" -PassThru
+$process = Start-Process -FilePath $extractPath\nvidiaProfileInspector.exe -ArgumentList "-silentImport `"$extractPath\Base Profile.nip`"" -PassThru
 
 # Wait for the process to exit
 $process.WaitForExit()
-
-# Change directory back to a safe location
-Set-Location -Path $env:TEMP
 
 # Clean up
 Remove-Item -Recurse -Force -Path $tempDir
