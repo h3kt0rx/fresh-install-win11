@@ -69,11 +69,17 @@ Write-Host "Downloaded and Imported NVIDIA Profile"
 
 # Function to Enable Game Mode
 function Enable-GameMode {
-    $gameModePath = "HKLM:\SOFTWARE\Microsoft\GameBar"
+    $gameModePath = "HKCU:\SOFTWARE\Microsoft\GameBar"
+    
+    # Check if the path exists, create it if it doesn't
     if (-not (Test-Path $gameModePath)) {
         New-Item -Path $gameModePath -Force
     }
-    Set-ItemProperty -Path $gameModePath -Name "AllowGameBar" -Value 1 -ErrorAction SilentlyContinue
+    
+    # Set or create properties
+    New-ItemProperty -Path $gameModePath -Name "AutoGameModeEnabled" -Value 1 -PropertyType DWord -Force
+    New-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -PropertyType DWord -Force
+    
     Write-Host "Game Mode has been enabled."
 }
 
