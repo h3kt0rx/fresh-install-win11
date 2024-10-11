@@ -97,8 +97,8 @@ function Enable-GameMode {
     }
     
     # Set or create properties
-    New-ItemProperty -Path $gameModePath -Name "AutoGameModeEnabled" -Value 1 -PropertyType DWord -Force -ErrorAction SilentlyContinue
-    New-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -PropertyType DWord -Force -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path $gameModePath -Name "AutoGameModeEnabled" -Value 1 -PropertyType DWord -Force -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -PropertyType DWord -Force -ErrorAction SilentlyContinue
 }
 
 # Function to Disable Core Isolation Memory Integrity
