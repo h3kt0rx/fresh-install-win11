@@ -1,5 +1,5 @@
 function Enable-GameMode {
-    $gameModePath = "HKLM:\SOFTWARE\Microsoft\GameBar"
+    $gameModePath = "HKCU:\SOFTWARE\Microsoft\GameBar"
     
     # Check if the path exists, create it if it doesn't
     if (-not (Test-Path $gameModePath)) {
