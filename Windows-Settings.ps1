@@ -93,12 +93,12 @@ function Enable-GameMode {
     
     # Check if the path exists, create it if it doesn't
     if (-not (Test-Path $gameModePath)) {
-        New-Item -Path $gameModePath -Force
+        New-Item -Path $gameModePath -PropertyType DWord -Force
     }
     
     # Set or create properties
-    Set-ItemProperty -Path $gameModePath -Name "AutoGameModeEnabled" -Value 1 -PropertyType DWord -Force -ErrorAction SilentlyContinue
-    Set-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -PropertyType DWord -Force -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path $gameModePath -Name "AutoGameModeEnabled" -Value 1 -Force -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -Force -ErrorAction SilentlyContinue
 }
 
 # Function to Disable Core Isolation Memory Integrity
@@ -106,7 +106,7 @@ function Disable-CoreIsolation {
     $memoryIntegrityPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeviceGuard"
     
     if (-not (Test-Path $memoryIntegrityPath)) {
-        New-Item -Path $memoryIntegrityPath -Force
+        New-Item -Path $memoryIntegrityPath -PropertyType DWord -Force
     }
 
     # Set Memory Integrity to disabled
@@ -1688,17 +1688,6 @@ Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies
 ############################################################################################################################################################
 
 
-
-
-    If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator"))
-    {Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-    Exit}
-    $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + " (Administrator)"
-    $Host.UI.RawUI.BackgroundColor = "Black"
-	  $Host.PrivateData.ProgressBackgroundColor = "Black"
-    $Host.PrivateData.ProgressForegroundColor = "White"
-    
-
     function Get-FileFromWeb {
     param ([Parameter(Mandatory)][string]$URL, [Parameter(Mandatory)][string]$File)
     function Show-Progress {
@@ -1807,18 +1796,6 @@ Write-Output "Updated DirectX"
 ############################################################################################################################################################
 
 
-
-
-
-    If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator"))
-    {Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-    Exit}
-    $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + " (Administrator)"
-    $Host.UI.RawUI.BackgroundColor = "Black"
-	  $Host.PrivateData.ProgressBackgroundColor = "Black"
-    $Host.PrivateData.ProgressForegroundColor = "White"
-    
-
 # clear %temp% folder
 Remove-Item -Path "$env:USERPROFILE\AppData\Local\Temp" -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
 New-Item -Path "$env:USERPROFILE\AppData\Local" -Name "Temp" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
@@ -1830,9 +1807,12 @@ New-Item -Path "$env:C:\Windows" -Name "Temp" -ItemType Directory -ErrorAction S
 
 Write-Host "Restart to apply . . ."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-# open nvidiacontrolpanel
-#Start-Process "shell:appsFolder\NVIDIACorp.NVIDIAControlPanel_56jybvy8sckqj!NVIDIACorp.NVIDIAControlPanel"
 
+############################################################################################################################################################
+<# Run Titus Script #>
+############################################################################################################################################################
+
+iwr -useb "https://christitus.com/win" | iex
 
 <#
 
