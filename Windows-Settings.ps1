@@ -53,20 +53,21 @@ $tempDir = "$env:TEMP\nvidiaProfileInspector"
 $zipPath = "$tempDir\nvidiaProfileInspector.zip"
 $extractPath = "$tempDir\nvidiaProfileInspector"
 
-# Create temporary directory
-New-Item -ItemType Directory -Force -Path $tempDir
+# Create the directory and suppress output
+New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
 
-# Download the ZIP file
-Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+# Download the ZIP file and suppress output
+Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath | Out-Null
 
-# Extract the ZIP file
-Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+# Extract the ZIP file and suppress output
+Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force | Out-Null
 
-# Download the configuration file
-Invoke-WebRequest -Uri $configUrl -OutFile "$extractPath\Base Profile.nip"
+# Download the configuration file and suppress output
+Invoke-WebRequest -Uri $configUrl -OutFile "$extractPath\Base Profile.nip" | Out-Null
+
 
 # Change directory to where the executable is located
-Set-Location -Path $extractPath
+Set-Location -Path $extractPath | Out-Null
 
 # Run the command to import the profile silently
 $process = Start-Process -FilePath ".\nvidiaProfileInspector.exe" -ArgumentList "-silentImport `".\Base Profile.nip`"" -PassThru
@@ -96,8 +97,8 @@ function Enable-GameMode {
     }
     
     # Set or create properties
-    New-ItemProperty -Path $gameModePath -Name "AutoGameModeEnabled" -Value 1 -PropertyType DWord -Force
-    New-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -PropertyType DWord -Force
+    New-ItemProperty -Path $gameModePath -Name "AutoGameModeEnabled" -Value 1 -PropertyType DWord -Force -ErrorAction SilentlyContinue
+    New-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -PropertyType DWord -Force -ErrorAction SilentlyContinue
 }
 
 # Function to Disable Core Isolation Memory Integrity
