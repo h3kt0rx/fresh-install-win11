@@ -9,7 +9,6 @@ function Enable-GameMode {
     # Set or create properties
     New-ItemProperty -Path $gameModePath -Name "AutoGameModeEnabled" -Value 1 -PropertyType DWord -Force
     New-ItemProperty -Path $gameModePath -Name "UseGameMode" -Value 1 -PropertyType DWord -Force
-    Write-Host "Game Mode has been enabled."
 }
 
 # Function to Disable Core Isolation Memory Integrity
@@ -22,9 +21,10 @@ function Disable-CoreIsolation {
 
     # Set Memory Integrity to disabled
     Set-ItemProperty -Path $memoryIntegrityPath -Name "EnableVirtualizationBasedSecurity" -Value 0 -ErrorAction SilentlyContinue
-    Write-Host "Core Isolation Memory Integrity has been disabled."
 }
 
 # Execute Optimization Functions
 Disable-CoreIsolation
 Enable-GameMode
+Write-Host "Game Mode has been enabled."
+Write-Host "Core Isolation Memory Integrity has been disabled."
