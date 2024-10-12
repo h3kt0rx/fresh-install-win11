@@ -141,7 +141,7 @@ $values = @{
 foreach ($path in $values.Keys) {
     $name = $values[$path]
     if (-not (Test-Path "$path\$name")) { New-Item -Path $path -Force }
-    Set-ItemProperty -Path $path -Name $name -Value 0 -Type DWord
+    Set-ItemProperty -Path $path -Name $name -Value 0 -Type DWord | Out-Null
 }
 # stop gamebar running
 Stop-Process -Force -Name GameBar -ErrorAction SilentlyContinue | Out-Null
