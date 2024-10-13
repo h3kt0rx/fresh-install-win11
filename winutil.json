@@ -1,0 +1,95 @@
+{
+  "WPFTweaks": [
+    "WPFTweaksUTC",
+    "WPFTweaksServices",
+    "WPFTweaksWifi",
+    "WPFTweaksRemoveHomeGallery",
+    "WPFTweaksRightClickMenu",
+    "WPFTweaksDisableLMS1",
+    "WPFTweaksDeleteTempFiles",
+    "WPFTweaksIPv46",
+    "WPFTweaksDebloatAdobe",
+    "WPFTweaksRemoveOnedrive",
+    "WPFTweaksBlockAdobeNet",
+    "WPFTweaksPowershell7Tele",
+    "WPFTweaksConsumerFeatures",
+    "WPFTweaksHiber",
+    "WPFTweaksHome",
+    "WPFTweaksAH",
+    "WPFTweaksRazerBlock",
+    "WPFTweaksRemoveCopilot",
+    "WPFTweaksEndTaskOnTaskbar",
+    "WPFTweaksDisableipsix",
+    "WPFTweaksTele",
+    "WPFTweaksPowershell7",
+    "WPFTweaksDiskCleanup",
+    "WPFTweaksLoc",
+    "WPFTweaksEdgeDebloat",
+    "WPFTweaksStorage",
+    "WPFTweaksDisableBGapps",
+    "WPFTweaksDVR",
+    "WPFTweaksTeredo"
+  ],
+  "Install": [
+    {
+      "winget": "Notepad++.Notepad++",
+      "choco": "notepadplusplus"
+    },
+    {
+      "winget": "Giorgiotani.Peazip",
+      "choco": "peazip"
+    },
+    {
+      "winget": "ddu",
+      "choco": "ddu"
+    },
+    {
+      "winget": "GlavSoft.TightVNC",
+      "choco": "TightVNC"
+    },
+    {
+      "winget": "TechPowerUp.NVCleanstall",
+      "choco": "na"
+    },
+    {
+      "winget": "Discord.Discord",
+      "choco": "discord"
+    },
+    {
+      "winget": "VideoLAN.VLC",
+      "choco": "vlc"
+    },
+    {
+      "winget": "na",
+      "choco": "equalizerapo"
+    },
+    {
+      "winget": "Alex313031.Thorium.AVX2",
+      "choco": "na"
+    },
+    {
+      "winget": "RustDesk.RustDesk",
+      "choco": "rustdesk.portable"
+    },
+    {
+      "winget": "Valve.Steam",
+      "choco": "steam-client"
+    }
+  ],
+  "WPFFeature": [
+    "WPFFeaturenfs"
+  ],
+  "WPFInstall": [
+    "WPFInstallnotepadplus",
+    "WPFInstallpeazip",
+    "WPFInstallddu",
+    "WPFInstalltightvnc",
+    "WPFInstallnvclean",
+    "WPFInstalldiscord",
+    "WPFInstallvlc",
+    "WPFInstallEqualizerAPO",
+    "WPFInstallthorium",
+    "WPFInstallrustdesk",
+    "WPFInstallsteam"
+  ]
+}
