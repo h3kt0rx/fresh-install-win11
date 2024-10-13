@@ -1257,7 +1257,6 @@ $DXFileUri2 = "https://www.7-zip.org/a/7z2301-x64.exe"
 $DXDestination = "$env:TEMP\directx_Jun2010_redist.exe"
 $DXDestination2 = "$env:TEMP\7-Zip.exe"
 $DXExtractPath = "$env:TEMP\DirectX_Install"
-
 # Download the DirectX Web Setup
 $DXbitsJobObj = Start-BitsTransfer -Source $DXFileUri -Destination $DXDestination
 $DXbitsJobObj = Start-BitsTransfer -Source $DXFileUri2 -Destination $DXDestination2
@@ -1282,7 +1281,6 @@ Start-Process -wait "$env:TEMP\7-Zip.exe" /S
 cmd /c "C:\Program Files\7-Zip\7z.exe" x "$DXDestination" -o"$DXExtractPath" -y | Out-Null
 # install direct x
 Start-Process "$DXExtractPath\DXSETUP.exe" -ArgumentList "/silent" -Wait
-
 # Clean up the installer
 Remove-Item -Path $DXDestination -Force
 Write-Host "Done." 
@@ -1301,7 +1299,6 @@ New-Item -Path "$env:C:\Windows" -Name "Temp" -ItemType Directory -ErrorAction S
 Write-Host "Done." 
 Write-Host "Restart your computer for settings to take effect."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-
 ############################################################################################################################################################
 <# Run Titus Script #>
 ############################################################################################################################################################
