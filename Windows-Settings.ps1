@@ -115,7 +115,7 @@ $values = @{
 
 foreach ($path in $values.Keys) {
     $name = $values[$path]
-    if (-not (Test-Path "$path\$name")) { New-Item -Path $path -Force }
+    if (-not (Test-Path "$path\$name")) { New-Item -Path $path -Force | Out-Null }
     Set-ItemProperty -Path $path -Name $name -Value 0 -Type DWord | Out-Null
 }
 # stop gamebar running
@@ -283,220 +283,7 @@ powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 de830923-a562-41a
 powercfg /setacvalueindex 99999999-9999-9999-9999-999999999999 de830923-a562-41af-a086-e3a2c6bad2da e69653ca-cf7f-4f05-aa73-cb833fa90ad4 0x00000000
 powercfg /setdcvalueindex 99999999-9999-9999-9999-999999999999 de830923-a562-41af-a086-e3a2c6bad2da e69653ca-cf7f-4f05-aa73-cb833fa90ad4 0x00000000
 Write-Host "Done." 
-############################################################################################################################################################
-<# Timer Resolution #>
-############################################################################################################################################################
-Write-Host "Installing: Set Timer Resolution Service"
-# create .cs file
-$MultilineComment = @"
-using System;
-using System.Runtime.InteropServices;
-using System.ServiceProcess;
-using System.ComponentModel;
-using System.Configuration.Install;
-using System.Collections.Generic;
-using System.Reflection;
-using System.IO;
-using System.Management;
-using System.Threading;
-using System.Diagnostics;
-[assembly: AssemblyVersion("2.1")]
-[assembly: AssemblyProduct("Set Timer Resolution service")]
-namespace WindowsService
-{
-    class WindowsService : ServiceBase
-    {
-        public WindowsService()
-        {
-            this.ServiceName = "STR";
-            this.EventLog.Log = "Application";
-            this.CanStop = true;
-            this.CanHandlePowerEvent = false;
-            this.CanHandleSessionChangeEvent = false;
-            this.CanPauseAndContinue = false;
-            this.CanShutdown = false;
-        }
-        static void Main()
-        {
-            ServiceBase.Run(new WindowsService());
-        }
-        protected override void OnStart(string[] args)
-        {
-            base.OnStart(args);
-            ReadProcessList();
-            NtQueryTimerResolution(out this.MininumResolution, out this.MaximumResolution, out this.DefaultResolution);
-            if(null != this.EventLog)
-                try { this.EventLog.WriteEntry(String.Format("Minimum={0}; Maximum={1}; Default={2}; Processes='{3}'", this.MininumResolution, this.MaximumResolution, this.DefaultResolution, null != this.ProcessesNames ? String.Join("','", this.ProcessesNames) : "")); }
-                catch {}
-            if(null == this.ProcessesNames)
-            {
-                SetMaximumResolution();
-                return;
-            }
-            if(0 == this.ProcessesNames.Count)
-            {
-                return;
-            }
-            this.ProcessStartDelegate = new OnProcessStart(this.ProcessStarted);
-            try
-            {
-                String query = String.Format("SELECT * FROM __InstanceCreationEvent WITHIN 0.5 WHERE (TargetInstance isa \"Win32_Process\") AND (TargetInstance.Name=\"{0}\")", String.Join("\" OR TargetInstance.Name=\"", this.ProcessesNames));
-                this.startWatch = new ManagementEventWatcher(query);
-                this.startWatch.EventArrived += this.startWatch_EventArrived;
-                this.startWatch.Start();
-            }
-            catch(Exception ee)
-            {
-                if(null != this.EventLog)
-                    try { this.EventLog.WriteEntry(ee.ToString(), EventLogEntryType.Error); }
-                    catch {}
-            }
-        }
-        protected override void OnStop()
-        {
-            if(null != this.startWatch)
-            {
-                this.startWatch.Stop();
-            }
 
-            base.OnStop();
-        }
-        ManagementEventWatcher startWatch;
-        void startWatch_EventArrived(object sender, EventArrivedEventArgs e) 
-        {
-            try
-            {
-                ManagementBaseObject process = (ManagementBaseObject)e.NewEvent.Properties["TargetInstance"].Value;
-                UInt32 processId = (UInt32)process.Properties["ProcessId"].Value;
-                this.ProcessStartDelegate.BeginInvoke(processId, null, null);
-            } 
-            catch(Exception ee) 
-            {
-                if(null != this.EventLog)
-                    try { this.EventLog.WriteEntry(ee.ToString(), EventLogEntryType.Warning); }
-                    catch {}
-
-            }
-        }
-        [DllImport("kernel32.dll", SetLastError=true)]
-        static extern Int32 WaitForSingleObject(IntPtr Handle, Int32 Milliseconds);
-        [DllImport("kernel32.dll", SetLastError=true)]
-        static extern IntPtr OpenProcess(UInt32 DesiredAccess, Int32 InheritHandle, UInt32 ProcessId);
-        [DllImport("kernel32.dll", SetLastError=true)]
-        static extern Int32 CloseHandle(IntPtr Handle);
-        const UInt32 SYNCHRONIZE = 0x00100000;
-        delegate void OnProcessStart(UInt32 processId);
-        OnProcessStart ProcessStartDelegate = null;
-        void ProcessStarted(UInt32 processId)
-        {
-            SetMaximumResolution();
-            IntPtr processHandle = IntPtr.Zero;
-            try
-            {
-                processHandle = OpenProcess(SYNCHRONIZE, 0, processId);
-                if(processHandle != IntPtr.Zero)
-                    WaitForSingleObject(processHandle, -1);
-            } 
-            catch(Exception ee) 
-            {
-                if(null != this.EventLog)
-                    try { this.EventLog.WriteEntry(ee.ToString(), EventLogEntryType.Warning); }
-                    catch {}
-            }
-            finally
-            {
-                if(processHandle != IntPtr.Zero)
-                    CloseHandle(processHandle); 
-            }
-            SetDefaultResolution();
-        }
-        List<String> ProcessesNames = null;
-        void ReadProcessList()
-        {
-            String iniFilePath = Assembly.GetExecutingAssembly().Location + ".ini";
-            if(File.Exists(iniFilePath))
-            {
-                this.ProcessesNames = new List<String>();
-                String[] iniFileLines = File.ReadAllLines(iniFilePath);
-                foreach(var line in iniFileLines)
-                {
-                    String[] names = line.Split(new char[] {',', ' ', ';'} , StringSplitOptions.RemoveEmptyEntries);
-                    foreach(var name in names)
-                    {
-                        String lwr_name = name.ToLower();
-                        if(!lwr_name.EndsWith(".exe"))
-                            lwr_name += ".exe";
-                        if(!this.ProcessesNames.Contains(lwr_name))
-                            this.ProcessesNames.Add(lwr_name);
-                    }
-                }
-            }
-        }
-        [DllImport("ntdll.dll", SetLastError=true)]
-        static extern int NtSetTimerResolution(uint DesiredResolution, bool SetResolution, out uint CurrentResolution);
-        [DllImport("ntdll.dll", SetLastError=true)]
-        static extern int NtQueryTimerResolution(out uint MinimumResolution, out uint MaximumResolution, out uint ActualResolution);
-        uint DefaultResolution = 0;
-        uint MininumResolution = 0;
-        uint MaximumResolution = 0;
-        long processCounter = 0;
-        void SetMaximumResolution()
-        {
-            long counter = Interlocked.Increment(ref this.processCounter);
-            if(counter <= 1)
-            {
-                uint actual = 0;
-                NtSetTimerResolution(this.MaximumResolution, true, out actual);
-                if(null != this.EventLog)
-                    try { this.EventLog.WriteEntry(String.Format("Actual resolution = {0}", actual)); }
-                    catch {}
-            }
-        }
-        void SetDefaultResolution()
-        {
-            long counter = Interlocked.Decrement(ref this.processCounter);
-            if(counter < 1)
-            {
-                uint actual = 0;
-                NtSetTimerResolution(this.DefaultResolution, true, out actual);
-                if(null != this.EventLog)
-                    try { this.EventLog.WriteEntry(String.Format("Actual resolution = {0}", actual)); }
-                    catch {}
-            }
-        }
-    }
-    [RunInstaller(true)]
-    public class WindowsServiceInstaller : Installer
-    {
-        public WindowsServiceInstaller()
-        {
-            ServiceProcessInstaller serviceProcessInstaller = 
-                               new ServiceProcessInstaller();
-            ServiceInstaller serviceInstaller = new ServiceInstaller();
-            serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
-            serviceProcessInstaller.Username = null;
-            serviceProcessInstaller.Password = null;
-            serviceInstaller.DisplayName = "Set Timer Resolution Service";
-            serviceInstaller.StartType = ServiceStartMode.Automatic;
-            serviceInstaller.ServiceName = "STR";
-            this.Installers.Add(serviceProcessInstaller);
-            this.Installers.Add(serviceInstaller);
-        }
-    }
-}
-"@
-Set-Content -Path "$env:C:\Windows\SetTimerResolutionService.cs" -Value $MultilineComment -Force
-# compile and create service
-Start-Process -Wait "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe" -ArgumentList "-out:C:\Windows\SetTimerResolutionService.exe C:\Windows\SetTimerResolutionService.cs" -WindowStyle Hidden
-# delete file
-Remove-Item "$env:C:\Windows\SetTimerResolutionService.cs" -ErrorAction SilentlyContinue | Out-Null
-# install and start service
-New-Service -Name "Set Timer Resolution Service" -BinaryPathName "$env:C:\Windows\SetTimerResolutionService.exe" -ErrorAction SilentlyContinue | Out-Null
-Set-Service -Name "Set Timer Resolution Service" -StartupType Automatic -ErrorAction SilentlyContinue | Out-Null
-Set-Service -Name "Set Timer Resolution Service" -Status Running -ErrorAction SilentlyContinue | Out-Null
-# fix timer resolution regedit
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "GlobalTimerResolutionRequests" /t REG_DWORD /d "1" /f | Out-Null
-Write-Host "Done." 
 ############################################################################################################################################################
 <# Registry #>
 ############################################################################################################################################################
@@ -972,32 +759,31 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx" -Name "A
 # PERSONALIZATION
 #-----------------
 
-# Function to remove specified registry properties
-function Remove-RegistryProperties {
-    param ([array]$Items)  # Accepts an array of registry entries to remove
-    foreach ($item in $Items) {  # Loop through each item in the provided array
-        # Check if the specified registry path exists or if the property exists
-        if (Test-Path -Path $item.Path -or (Get-ItemProperty -Path $item.Path -Name $item.Name -ErrorAction SilentlyContinue)) {  
-            # Remove the specified registry property if it exists
-            Remove-ItemProperty -Path $item.Path -Name $item.Name -ErrorAction SilentlyContinue  
+# Define the registry paths and values to remove
+$registryPaths = @(
+    "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer",  # Path for user-specific Explorer policies
+    "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer",  # Path for current user Explorer settings
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"   # Path for local machine Explorer settings
+)
+
+# Define the registry values that we want to remove
+$valuesToRemove = @(
+    "ShowOrHideMostUsedApps",  # Controls the visibility of the most used apps on the Start menu
+    "NoStartMenuMFUprogramsList",  # Disables the Most Frequently Used programs list on the Start menu
+    "NoInstrumentation"  # Disables telemetry and usage tracking for the Start menu
+)
+
+# Loop through each registry path
+foreach ($path in $registryPaths) {
+    # Loop through each value to remove
+    foreach ($value in $valuesToRemove) {
+        # Check if the registry value exists before attempting to remove it
+        if (Test-Path "$path\$value") {
+            # Remove the specified registry value from the path
+            Remove-ItemProperty -Path $path -Name $value -ErrorAction SilentlyContinue | Out-Null
         }
     }
 }
-# Define an array of hashtables representing registry entries to remove
-$itemsToRemove = @(  
-    # Remove the setting that shows or hides most used apps in the Start menu
-    @{ Path = "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer"; Name = "ShowOrHideMostUsedApps" },  
-    # Remove the setting that disables the most frequently used programs list in the Start menu
-    @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoStartMenuMFUprogramsList" },  
-    # Remove the setting that disables Windows instrumentation, which can affect telemetry
-    @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoInstrumentation" },  
-    # Remove the setting that disables the most frequently used programs list in the Start menu for all users
-    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoStartMenuMFUprogramsList" },  
-    # Remove the setting that disables Windows instrumentation for all users
-    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoInstrumentation" }  
-)
-# Call the function to remove the specified registry properties
-Remove-RegistryProperties $itemsToRemove 
 # Set a solid color as the background
 Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "Wallpaper" -Value ""
 # Set wallpaper type to solid color
@@ -1139,8 +925,17 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\nvlddmkm\FTS" -N
 # GRAPHICS
 #----------
 
+# Define the registry path and the value name
+$registryPath = "HKLM:\SOFTWARE\Microsoft\Windows\Dwm"
 # Enable MPO (Multi Plane Overlay)
-Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\Dwm" -Name "OverlayTestMode"
+$valueName = "OverlayTestMode"
+# Check if the registry key exists
+if (Test-Path $registryPath) {
+    # Remove the OverlayTestMode value
+    Remove-ItemProperty -Path $registryPath -Name $valueName -ErrorAction SilentlyContinue
+    Write-Host "Successfully removed '$valueName' from '$registryPath'. MPO enabled."
+}
+
 # Configure games scheduling for performance
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" -Name "Affinity" -Value 0
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" -Name "Background Only" -Value "False"
@@ -1209,6 +1004,7 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentD
 # OTHER
 #-------
 
+
 # Function to remove specified registry keys
 function Remove-RegistryKeys {
     param ([array]$Items)  # Accepts an array of registry paths to remove
@@ -1232,7 +1028,35 @@ $itemsToRemove = @(
     @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace_41040327\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" }  
 )
 # Call the function to remove the specified registry keys
-Remove-RegistryKeys $itemsToRemove 
+Remove-RegistryKeys $itemsToRemove  
+# Script to disable Enhance Pointer Precision
+# Define the registry path
+$registryPath = "HKCU:\Control Panel\Mouse"
+# Define the registry values and their intended settings
+$values = @{
+    "MouseSpeed"     = "0"
+    "MouseThreshold1" = "0"
+    "MouseThreshold2" = "0"
+}
+# Check if the registry path exists
+if (-not (Test-Path $registryPath)) {
+    New-Item -Path $registryPath -Force | Out-Null
+}
+# Iterate through each value and set it
+foreach ($name in $values.Keys) {
+    $value = $values[$name]
+    # Check if the registry value exists
+    if (-not (Get-ItemProperty -Path $registryPath -Name $name -ErrorAction SilentlyContinue)) {
+        # If the value does not exist, create it
+        New-ItemProperty -Path $registryPath -Name $name -Value $value -PropertyType String -Force | Out-Null
+    } else {
+        # If the value exists, check if it needs to be updated
+        $currentValue = (Get-ItemProperty -Path $registryPath -Name $name).$name
+        if ($currentValue -ne $value) {
+            Set-ItemProperty -Path $registryPath -Name $name -Value $value | Out-Null
+        }
+    }
+}
 # Restore the classic context menu
 Set-ItemProperty -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Name "(default)" -Value ""
 # Remove Quick Access from File Explorer
@@ -1245,9 +1069,9 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSe
 Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSensitivity" -Value "10"
 Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "SmoothMouseXCurve" -Value ([byte[]](0,0,0,0,0,0,0,0,192,204,12,0,0,0,0,0,128,153,25,0,0,0,0,0,64,102,38,0,0,0,0,0))
 Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "SmoothMouseYCurve" -Value ([byte[]](0,0,0,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,112,0,0,0,0,0,0,0,168,0,0,0,0,0,0,0,224,0,0,0,0,0))
-Set-ItemProperty -Path "HKCU\.DEFAULT\Control Panel\Mouse" -Name "MouseSpeed" -Value "0"
-Set-ItemProperty -Path "HKCU\.DEFAULT\Control Panel\Mouse" -Name "MouseThreshold1" -Value "0"
-Set-ItemProperty -Path "HKCU\.DEFAULT\Control Panel\Mouse" -Name "MouseThreshold2" -Value "0"
+
+
+
 # Disable ConfirmFileDelete
 Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "ConfirmFileDelete" -Type DWord -Value 1
 
@@ -1355,21 +1179,6 @@ Start-Process "$DXExtractPath\DXSETUP.exe" -ArgumentList "/silent" -Wait
 Remove-Item -Path $DXDestination -Force
 Write-Host "Done." 
 ############################################################################################################################################################
-<# Cleanup #>
-############################################################################################################################################################
-Write-Host "Running Cleanup" 
-# clear %temp% folder
-Remove-Item -Path "$env:USERPROFILE\AppData\Local\Temp" -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
-New-Item -Path "$env:USERPROFILE\AppData\Local" -Name "Temp" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
-<# # open %temp% folder
-Start-Process $env:TEMP #>
-# clear temp folder
-Remove-Item -Path "$env:C:\Windows\Temp" -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
-New-Item -Path "$env:C:\Windows" -Name "Temp" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
-Write-Host "Done." 
-Write-Host "Restart your computer for settings to take effect."
-$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-############################################################################################################################################################
 <# Run Titus Script #>
 ############################################################################################################################################################
 #iwr -useb "https://christitus.com/win" | iex
@@ -1449,3 +1258,233 @@ spotify
 tor
 davinci resolve
  #>
+
+ ############################################################################################################################################################
+<# Timer Resolution #>
+############################################################################################################################################################
+Write-Host "Installing: Set Timer Resolution Service"
+# create .cs file
+$MultilineComment = @"
+using System;
+using System.Runtime.InteropServices;
+using System.ServiceProcess;
+using System.ComponentModel;
+using System.Configuration.Install;
+using System.Collections.Generic;
+using System.Reflection;
+using System.IO;
+using System.Management;
+using System.Threading;
+using System.Diagnostics;
+[assembly: AssemblyVersion("2.1")]
+[assembly: AssemblyProduct("Set Timer Resolution service")]
+namespace WindowsService
+{
+    class WindowsService : ServiceBase
+    {
+        public WindowsService()
+        {
+            this.ServiceName = "STR";
+            this.EventLog.Log = "Application";
+            this.CanStop = true;
+            this.CanHandlePowerEvent = false;
+            this.CanHandleSessionChangeEvent = false;
+            this.CanPauseAndContinue = false;
+            this.CanShutdown = false;
+        }
+        static void Main()
+        {
+            ServiceBase.Run(new WindowsService());
+        }
+        protected override void OnStart(string[] args)
+        {
+            base.OnStart(args);
+            ReadProcessList();
+            NtQueryTimerResolution(out this.MininumResolution, out this.MaximumResolution, out this.DefaultResolution);
+            if(null != this.EventLog)
+                try { this.EventLog.WriteEntry(String.Format("Minimum={0}; Maximum={1}; Default={2}; Processes='{3}'", this.MininumResolution, this.MaximumResolution, this.DefaultResolution, null != this.ProcessesNames ? String.Join("','", this.ProcessesNames) : "")); }
+                catch {}
+            if(null == this.ProcessesNames)
+            {
+                SetMaximumResolution();
+                return;
+            }
+            if(0 == this.ProcessesNames.Count)
+            {
+                return;
+            }
+            this.ProcessStartDelegate = new OnProcessStart(this.ProcessStarted);
+            try
+            {
+                String query = String.Format("SELECT * FROM __InstanceCreationEvent WITHIN 0.5 WHERE (TargetInstance isa \"Win32_Process\") AND (TargetInstance.Name=\"{0}\")", String.Join("\" OR TargetInstance.Name=\"", this.ProcessesNames));
+                this.startWatch = new ManagementEventWatcher(query);
+                this.startWatch.EventArrived += this.startWatch_EventArrived;
+                this.startWatch.Start();
+            }
+            catch(Exception ee)
+            {
+                if(null != this.EventLog)
+                    try { this.EventLog.WriteEntry(ee.ToString(), EventLogEntryType.Error); }
+                    catch {}
+            }
+        }
+        protected override void OnStop()
+        {
+            if(null != this.startWatch)
+            {
+                this.startWatch.Stop();
+            }
+
+            base.OnStop();
+        }
+        ManagementEventWatcher startWatch;
+        void startWatch_EventArrived(object sender, EventArrivedEventArgs e) 
+        {
+            try
+            {
+                ManagementBaseObject process = (ManagementBaseObject)e.NewEvent.Properties["TargetInstance"].Value;
+                UInt32 processId = (UInt32)process.Properties["ProcessId"].Value;
+                this.ProcessStartDelegate.BeginInvoke(processId, null, null);
+            } 
+            catch(Exception ee) 
+            {
+                if(null != this.EventLog)
+                    try { this.EventLog.WriteEntry(ee.ToString(), EventLogEntryType.Warning); }
+                    catch {}
+
+            }
+        }
+        [DllImport("kernel32.dll", SetLastError=true)]
+        static extern Int32 WaitForSingleObject(IntPtr Handle, Int32 Milliseconds);
+        [DllImport("kernel32.dll", SetLastError=true)]
+        static extern IntPtr OpenProcess(UInt32 DesiredAccess, Int32 InheritHandle, UInt32 ProcessId);
+        [DllImport("kernel32.dll", SetLastError=true)]
+        static extern Int32 CloseHandle(IntPtr Handle);
+        const UInt32 SYNCHRONIZE = 0x00100000;
+        delegate void OnProcessStart(UInt32 processId);
+        OnProcessStart ProcessStartDelegate = null;
+        void ProcessStarted(UInt32 processId)
+        {
+            SetMaximumResolution();
+            IntPtr processHandle = IntPtr.Zero;
+            try
+            {
+                processHandle = OpenProcess(SYNCHRONIZE, 0, processId);
+                if(processHandle != IntPtr.Zero)
+                    WaitForSingleObject(processHandle, -1);
+            } 
+            catch(Exception ee) 
+            {
+                if(null != this.EventLog)
+                    try { this.EventLog.WriteEntry(ee.ToString(), EventLogEntryType.Warning); }
+                    catch {}
+            }
+            finally
+            {
+                if(processHandle != IntPtr.Zero)
+                    CloseHandle(processHandle); 
+            }
+            SetDefaultResolution();
+        }
+        List<String> ProcessesNames = null;
+        void ReadProcessList()
+        {
+            String iniFilePath = Assembly.GetExecutingAssembly().Location + ".ini";
+            if(File.Exists(iniFilePath))
+            {
+                this.ProcessesNames = new List<String>();
+                String[] iniFileLines = File.ReadAllLines(iniFilePath);
+                foreach(var line in iniFileLines)
+                {
+                    String[] names = line.Split(new char[] {',', ' ', ';'} , StringSplitOptions.RemoveEmptyEntries);
+                    foreach(var name in names)
+                    {
+                        String lwr_name = name.ToLower();
+                        if(!lwr_name.EndsWith(".exe"))
+                            lwr_name += ".exe";
+                        if(!this.ProcessesNames.Contains(lwr_name))
+                            this.ProcessesNames.Add(lwr_name);
+                    }
+                }
+            }
+        }
+        [DllImport("ntdll.dll", SetLastError=true)]
+        static extern int NtSetTimerResolution(uint DesiredResolution, bool SetResolution, out uint CurrentResolution);
+        [DllImport("ntdll.dll", SetLastError=true)]
+        static extern int NtQueryTimerResolution(out uint MinimumResolution, out uint MaximumResolution, out uint ActualResolution);
+        uint DefaultResolution = 0;
+        uint MininumResolution = 0;
+        uint MaximumResolution = 0;
+        long processCounter = 0;
+        void SetMaximumResolution()
+        {
+            long counter = Interlocked.Increment(ref this.processCounter);
+            if(counter <= 1)
+            {
+                uint actual = 0;
+                NtSetTimerResolution(this.MaximumResolution, true, out actual);
+                if(null != this.EventLog)
+                    try { this.EventLog.WriteEntry(String.Format("Actual resolution = {0}", actual)); }
+                    catch {}
+            }
+        }
+        void SetDefaultResolution()
+        {
+            long counter = Interlocked.Decrement(ref this.processCounter);
+            if(counter < 1)
+            {
+                uint actual = 0;
+                NtSetTimerResolution(this.DefaultResolution, true, out actual);
+                if(null != this.EventLog)
+                    try { this.EventLog.WriteEntry(String.Format("Actual resolution = {0}", actual)); }
+                    catch {}
+            }
+        }
+    }
+    [RunInstaller(true)]
+    public class WindowsServiceInstaller : Installer
+    {
+        public WindowsServiceInstaller()
+        {
+            ServiceProcessInstaller serviceProcessInstaller = 
+                               new ServiceProcessInstaller();
+            ServiceInstaller serviceInstaller = new ServiceInstaller();
+            serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
+            serviceProcessInstaller.Username = null;
+            serviceProcessInstaller.Password = null;
+            serviceInstaller.DisplayName = "Set Timer Resolution Service";
+            serviceInstaller.StartType = ServiceStartMode.Automatic;
+            serviceInstaller.ServiceName = "STR";
+            this.Installers.Add(serviceProcessInstaller);
+            this.Installers.Add(serviceInstaller);
+        }
+    }
+}
+"@
+Set-Content -Path "$env:C:\Windows\SetTimerResolutionService.cs" -Value $MultilineComment -Force
+# compile and create service
+Start-Process -Wait "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe" -ArgumentList "-out:C:\Windows\SetTimerResolutionService.exe C:\Windows\SetTimerResolutionService.cs" -WindowStyle Hidden
+# delete file
+Remove-Item "$env:C:\Windows\SetTimerResolutionService.cs" -ErrorAction SilentlyContinue | Out-Null
+# install and start service
+New-Service -Name "Set Timer Resolution Service" -BinaryPathName "$env:C:\Windows\SetTimerResolutionService.exe" -ErrorAction SilentlyContinue | Out-Null
+Set-Service -Name "Set Timer Resolution Service" -StartupType Automatic -ErrorAction SilentlyContinue | Out-Null
+Set-Service -Name "Set Timer Resolution Service" -Status Running -ErrorAction SilentlyContinue | Out-Null
+# fix timer resolution regedit
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "GlobalTimerResolutionRequests" /t REG_DWORD /d "1" /f | Out-Null
+Write-Host "Done." 
+############################################################################################################################################################
+<# Cleanup #>
+############################################################################################################################################################
+Write-Host "Running Cleanup" 
+# clear %temp% folder
+Remove-Item -Path "$env:USERPROFILE\AppData\Local\Temp" -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
+New-Item -Path "$env:USERPROFILE\AppData\Local" -Name "Temp" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
+<# # open %temp% folder
+Start-Process $env:TEMP #>
+# clear temp folder
+Remove-Item -Path "$env:C:\Windows\Temp" -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
+New-Item -Path "$env:C:\Windows" -Name "Temp" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
+Write-Host "Done." 
+Write-Host "Restart your computer for settings to take effect."
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
