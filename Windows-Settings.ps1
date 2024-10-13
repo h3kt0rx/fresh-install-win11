@@ -615,35 +615,62 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Multimedia\Audio" -Name "UserDu
 # Disable startup sound
 Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation" -Name "DisableStartupSound" -Value 1 
 Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\EditionOverrides" -Name "UserSetting_DisableStartupSound" -Value 1 
-# Set sound scheme to none
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes" -Name "" -Value ".None" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\.Default\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\CriticalBatteryAlarm\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\DeviceConnect\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\DeviceDisconnect\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\DeviceFail\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\FaxBeep\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\LowBatteryAlarm\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\MailBeep\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\MessageNudge\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Default\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.IM\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Mail\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Proximity\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Reminder\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.SMS\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\ProximityConnection\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\SystemAsterisk\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\SystemExclamation\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\SystemHand\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\SystemNotification\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\WindowsUAC\.Current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\DisNumbersSound\.current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\HubOffSound\.current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\HubOnSound\.current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\HubSleepSound\.current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\MisrecoSound\.current" -Name "" -Value "" 
-Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\PanelSound\.current" -Name "" -Value "" 
+# Set the default sound scheme to None
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes" -Name "(Default)" -Value ".None"
+# Set the default notification sound for the .Default app
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\.Default\.Current" -Name "(Default)" -Value ""
+# Set the default sound for CriticalBatteryAlarm
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\CriticalBatteryAlarm\.Current" -Name "(Default)" -Value ""
+# Set the default sound for DeviceConnect
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\DeviceConnect\.Current" -Name "(Default)" -Value ""
+# Set the default sound for DeviceDisconnect
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\DeviceDisconnect\.Current" -Name "(Default)" -Value ""
+# Set the default sound for DeviceFail
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\DeviceFail\.Current" -Name "(Default)" -Value ""
+# Set the default sound for FaxBeep
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\FaxBeep\.Current" -Name "(Default)" -Value ""
+# Set the default sound for LowBatteryAlarm
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\LowBatteryAlarm\.Current" -Name "(Default)" -Value ""
+# Set the default sound for MailBeep
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\MailBeep\.Current" -Name "(Default)" -Value ""
+# Set the default sound for MessageNudge
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\MessageNudge\.Current" -Name "(Default)" -Value ""
+# Set the default sound for Notification.Default
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Default\.Current" -Name "(Default)" -Value ""
+# Set the default sound for Notification.IM
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.IM\.Current" -Name "(Default)" -Value ""
+# Set the default sound for Notification.Mail
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Mail\.Current" -Name "(Default)" -Value ""
+# Set the default sound for Notification.Proximity
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Proximity\.Current" -Name "(Default)" -Value ""
+# Set the default sound for Notification.Reminder
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Reminder\.Current" -Name "(Default)" -Value ""
+# Set the default sound for Notification.SMS
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.SMS\.Current" -Name "(Default)" -Value ""
+# Set the default sound for ProximityConnection
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\ProximityConnection\.Current" -Name "(Default)" -Value ""
+# Set the default sound for SystemAsterisk
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\SystemAsterisk\.Current" -Name "(Default)" -Value ""
+# Set the default sound for SystemExclamation
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\SystemExclamation\.Current" -Name "(Default)" -Value ""
+# Set the default sound for SystemHand
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\SystemHand\.Current" -Name "(Default)" -Value ""
+# Set the default sound for SystemNotification
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\SystemNotification\.Current" -Name "(Default)" -Value ""
+# Set the default sound for WindowsUAC
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\WindowsUAC\.Current" -Name "(Default)" -Value ""
+# Set the default sound for DisNumbersSound in sapisvr
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\DisNumbersSound\.current" -Name "(Default)" -Value ""
+# Set the default sound for HubOffSound in sapisvr
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\HubOffSound\.current" -Name "(Default)" -Value ""
+# Set the default sound for HubOnSound in sapisvr
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\HubOnSound\.current" -Name "(Default)" -Value ""
+# Set the default sound for HubSleepSound in sapisvr
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\HubSleepSound\.current" -Name "(Default)" -Value ""
+# Set the default sound for MisrecoSound in sapisvr
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\MisrecoSound\.current" -Name "(Default)" -Value ""
+# Set the default sound for PanelSound in sapisvr
+Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\sapisvr\PanelSound\.current" -Name "(Default)" -Value ""
 # Disable autoplay for removable media to prevent automatic actions
 Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" -Name "DisableAutoplay" -Value 1 
 # Disable enhanced pointer precision to use a standard mouse speed
@@ -946,6 +973,32 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx" -Name "A
 # PERSONALIZATION
 #-----------------
 
+# Define an array of hashtables representing registry entries to remove
+$itemsToRemove = @(
+    # Remove the setting that shows or hides most used apps in the Start menu
+    @{ Path = "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer"; Name = "ShowOrHideMostUsedApps" },
+
+    # Remove the setting that disables the most frequently used programs list in the Start menu
+    @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoStartMenuMFUprogramsList" },
+
+    # Remove the setting that disables Windows instrumentation, which can affect telemetry
+    @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoInstrumentation" },
+
+    # Remove the setting that disables the most frequently used programs list in the Start menu for all users
+    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoStartMenuMFUprogramsList" },
+
+    # Remove the setting that disables Windows instrumentation for all users
+    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoInstrumentation" }
+)
+# Loop through each item in the array
+foreach ($item in $itemsToRemove) {
+    # Check if the specified registry path exists or if the property exists
+    if (Test-Path -Path $item.Path -or (Get-ItemProperty -Path $item.Path -Name $item.Name -ErrorAction SilentlyContinue)) {
+        # Remove the specified registry property if it exists
+        Remove-ItemProperty -Path $item.Path -Name $item.Name -ErrorAction SilentlyContinue
+    }
+}
+
 # Set a solid color as the background
 Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "Wallpaper" -Value ""
 # Set wallpaper type to solid color
@@ -967,11 +1020,6 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\DWM" -Name "Colorizatio
 Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" -Name "EnableTransparency" -Value 0
 # Always hide most used apps in the Start menu
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Explorer" -Name "ShowOrHideMostUsedApps" -Value 2
-Remove-ItemProperty -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer" -Name "ShowOrHideMostUsedApps"
-Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "NoStartMenuMFUprogramsList"
-Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "NoInstrumentation"
-Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "NoStartMenuMFUprogramsList"
-Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "NoInstrumentation"
 # Enable more pinned apps personalization in Start
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Start_Layout" -Value 1
 # Disable recently added apps in Start
@@ -1161,18 +1209,32 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentD
 #-------
 # OTHER
 #-------
+# Define an array of registry paths to remove specific items from the system
+$itemsToRemove = @(
+    # Remove the "3D Objects" folder from "This PC"
+    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" },
 
-# Remove 3D Objects from This PC
-Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" -Force
-Remove-Item -Path "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" -Force
-# Remove Quick Access from File Explorer
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -Name "HubMode" -Value 1
-# Remove Home from Desktop
-Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace_36354489\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" -Force
-# Remove Gallery from Desktop
-Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace_41040327\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" -Force
+    # Remove the "3D Objects" folder for 32-bit applications on a 64-bit system
+    @{ Path = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" },
+
+    # Remove the "Home" folder from the Desktop
+    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace_36354489\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" },
+
+    # Remove the "Gallery" folder from the Desktop
+    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace_41040327\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" }
+)
+# Loop through each item and remove it if it exists
+foreach ($item in $itemsToRemove) {
+    # Check if the specified path exists
+    if (Test-Path -Path $item.Path) {
+        # Remove the registry key at the specified path
+        Remove-Item -Path $item.Path -Force -ErrorAction SilentlyContinue
+    }
+}
 # Restore the classic context menu
 Set-ItemProperty -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Name "(default)" -Value ""
+# Remove Quick Access from File Explorer
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -Name "HubMode" -Value 1
 # Disable menu show delay
 Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "MenuShowDelay" -Value "0"
 # Disable driver searching & updates
@@ -1181,9 +1243,9 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSe
 Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSensitivity" -Value "10"
 Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "SmoothMouseXCurve" -Value ([byte[]](0,0,0,0,0,0,0,0,192,204,12,0,0,0,0,0,128,153,25,0,0,0,0,0,64,102,38,0,0,0,0,0))
 Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "SmoothMouseYCurve" -Value ([byte[]](0,0,0,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,112,0,0,0,0,0,0,0,168,0,0,0,0,0,0,0,224,0,0,0,0,0))
-Set-ItemProperty -Path "HKU\.DEFAULT\Control Panel\Mouse" -Name "MouseSpeed" -Value "0"
-Set-ItemProperty -Path "HKU\.DEFAULT\Control Panel\Mouse" -Name "MouseThreshold1" -Value "0"
-Set-ItemProperty -Path "HKU\.DEFAULT\Control Panel\Mouse" -Name "MouseThreshold2" -Value "0"
+Set-ItemProperty -Path "HKCU\.DEFAULT\Control Panel\Mouse" -Name "MouseSpeed" -Value "0"
+Set-ItemProperty -Path "HKCU\.DEFAULT\Control Panel\Mouse" -Name "MouseThreshold1" -Value "0"
+Set-ItemProperty -Path "HKCU\.DEFAULT\Control Panel\Mouse" -Name "MouseThreshold2" -Value "0"
 # Disable ConfirmFileDelete
 Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "ConfirmFileDelete" -Type DWord -Value 1
 
