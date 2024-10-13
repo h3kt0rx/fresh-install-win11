@@ -696,7 +696,6 @@ Set-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name "SizeNWSE" -Value (0x
 Set-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name "SizeWE" -Value (0x00, 0x00) 
 Set-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name "UpArrow" -Value (0x00, 0x00) 
 Set-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name "Wait" -Value (0x00, 0x00) 
-Set-ItemProperty -Path "HKCU:\Control Panel\Cursors" -Name "" -Value "" 
 
 #---------------------
 # NETWORK AND INTERNET
@@ -973,32 +972,32 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Appx" -Name "A
 # PERSONALIZATION
 #-----------------
 
-# Define an array of hashtables representing registry entries to remove
-$itemsToRemove = @(
-    # Remove the setting that shows or hides most used apps in the Start menu
-    @{ Path = "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer"; Name = "ShowOrHideMostUsedApps" },
-
-    # Remove the setting that disables the most frequently used programs list in the Start menu
-    @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoStartMenuMFUprogramsList" },
-
-    # Remove the setting that disables Windows instrumentation, which can affect telemetry
-    @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoInstrumentation" },
-
-    # Remove the setting that disables the most frequently used programs list in the Start menu for all users
-    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoStartMenuMFUprogramsList" },
-
-    # Remove the setting that disables Windows instrumentation for all users
-    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoInstrumentation" }
-)
-# Loop through each item in the array
-foreach ($item in $itemsToRemove) {
-    # Check if the specified registry path exists or if the property exists
-    if (Test-Path -Path $item.Path -or (Get-ItemProperty -Path $item.Path -Name $item.Name -ErrorAction SilentlyContinue)) {
-        # Remove the specified registry property if it exists
-        Remove-ItemProperty -Path $item.Path -Name $item.Name -ErrorAction SilentlyContinue
+# Function to remove specified registry properties
+function Remove-RegistryProperties {
+    param ([array]$Items)  # Accepts an array of registry entries to remove
+    foreach ($item in $Items) {  # Loop through each item in the provided array
+        # Check if the specified registry path exists or if the property exists
+        if (Test-Path -Path $item.Path -or (Get-ItemProperty -Path $item.Path -Name $item.Name -ErrorAction SilentlyContinue)) {  
+            # Remove the specified registry property if it exists
+            Remove-ItemProperty -Path $item.Path -Name $item.Name -ErrorAction SilentlyContinue  
+        }
     }
 }
-
+# Define an array of hashtables representing registry entries to remove
+$itemsToRemove = @(  
+    # Remove the setting that shows or hides most used apps in the Start menu
+    @{ Path = "HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer"; Name = "ShowOrHideMostUsedApps" },  
+    # Remove the setting that disables the most frequently used programs list in the Start menu
+    @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoStartMenuMFUprogramsList" },  
+    # Remove the setting that disables Windows instrumentation, which can affect telemetry
+    @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoInstrumentation" },  
+    # Remove the setting that disables the most frequently used programs list in the Start menu for all users
+    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoStartMenuMFUprogramsList" },  
+    # Remove the setting that disables Windows instrumentation for all users
+    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"; Name = "NoInstrumentation" }  
+)
+# Call the function to remove the specified registry properties
+Remove-RegistryProperties $itemsToRemove 
 # Set a solid color as the background
 Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "Wallpaper" -Value ""
 # Set wallpaper type to solid color
@@ -1209,28 +1208,31 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentD
 #-------
 # OTHER
 #-------
-# Define an array of registry paths to remove specific items from the system
-$itemsToRemove = @(
-    # Remove the "3D Objects" folder from "This PC"
-    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" },
 
-    # Remove the "3D Objects" folder for 32-bit applications on a 64-bit system
-    @{ Path = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" },
-
-    # Remove the "Home" folder from the Desktop
-    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace_36354489\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" },
-
-    # Remove the "Gallery" folder from the Desktop
-    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace_41040327\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" }
-)
-# Loop through each item and remove it if it exists
-foreach ($item in $itemsToRemove) {
-    # Check if the specified path exists
-    if (Test-Path -Path $item.Path) {
-        # Remove the registry key at the specified path
-        Remove-Item -Path $item.Path -Force -ErrorAction SilentlyContinue
+# Function to remove specified registry keys
+function Remove-RegistryKeys {
+    param ([array]$Items)  # Accepts an array of registry paths to remove
+    foreach ($item in $Items) {  # Loop through each item in the provided array
+        # Check if the specified path exists
+        if (Test-Path -Path $item.Path) {  
+            # Remove the registry key at the specified path
+            Remove-Item -Path $item.Path -Force -ErrorAction SilentlyContinue  
+        }
     }
 }
+# Define an array of hashtables representing registry entries to remove
+$itemsToRemove = @(  
+    # Remove the "3D Objects" folder from "This PC"
+    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" },  
+    # Remove the "3D Objects" folder for 32-bit applications on a 64-bit system
+    @{ Path = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" },  
+    # Remove the "Home" folder from the Desktop
+    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace_36354489\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" },  
+    # Remove the "Gallery" folder from the Desktop
+    @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace_41040327\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" }  
+)
+# Call the function to remove the specified registry keys
+Remove-RegistryKeys $itemsToRemove 
 # Restore the classic context menu
 Set-ItemProperty -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Name "(default)" -Value ""
 # Remove Quick Access from File Explorer
