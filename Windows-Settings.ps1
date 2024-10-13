@@ -37,8 +37,8 @@ Write-Host "Done."
 ############################################################################################################################################################
 Write-Host "Setting NVIDIA Profile" 
 # Define URLs
-$zipUrl = "https://github.com/Orbmu2k/nvidiaProfileInspector/releases/download/2.4.0.4/nvidiaProfileInspector.zip"
-$configUrl = "https://raw.githubusercontent.com/h3kt0rx/fresh-install-win11/refs/heads/main/Base%20Profile.nip"
+$zipUrl = "https://github.com/h3kt0rx/fresh-install-win11/raw/refs/heads/main/cfg/nvidiaProfileInspector.zip"
+$configUrl = "https://raw.githubusercontent.com/h3kt0rx/fresh-install-win11/refs/heads/main/cfg/Custom.nip"
 # Define temporary paths
 $tempDir = "$env:TEMP\nvidiaProfileInspector"
 $zipPath = "$tempDir\nvidiaProfileInspector.zip"
@@ -50,9 +50,9 @@ Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath | Out-Null
 # Extract the ZIP file and suppress output
 Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force | Out-Null
 # Download the configuration file and suppress output
-Invoke-WebRequest -Uri $configUrl -OutFile "$extractPath\Base Profile.nip" | Out-Null
+Invoke-WebRequest -Uri $configUrl -OutFile "$extractPath\Custom.nip" | Out-Null
 # Run the command to import the profile silently
-$process = Start-Process -FilePath $extractPath\nvidiaProfileInspector.exe -ArgumentList "-silentImport `"$extractPath\Base Profile.nip`"" -PassThru
+$process = Start-Process -FilePath $extractPath\nvidiaProfileInspector.exe -ArgumentList "-silentImport `"$extractPath\Custom.nip`"" -PassThru
 # Wait for the process to exit
 $process.WaitForExit()
 # Clean up
