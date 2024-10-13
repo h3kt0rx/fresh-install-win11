@@ -1240,8 +1240,6 @@ choco install notepadplusplus -y
 choco install thorium -y
 choco install discord -y
 choco install steam -y
-
-
 dolby atmos
 syncthing
 Peace GUI
