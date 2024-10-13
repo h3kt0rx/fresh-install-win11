@@ -932,8 +932,7 @@ $valueName = "OverlayTestMode"
 # Check if the registry key exists
 if (Test-Path $registryPath) {
     # Remove the OverlayTestMode value
-    Remove-ItemProperty -Path $registryPath -Name $valueName -ErrorAction SilentlyContinue
-    Write-Host "Successfully removed '$valueName' from '$registryPath'. MPO enabled."
+    Remove-ItemProperty -Path $registryPath -Name $valueName -ErrorAction SilentlyContinue | Out-Null
 }
 
 # Configure games scheduling for performance
@@ -1241,21 +1240,15 @@ choco install notepadplusplus -y
 choco install thorium -y
 choco install discord -y
 choco install steam -y
-rustdesk
+
+
 dolby atmos
 syncthing
-vscode
-nvcleaninstall
-ddu
+Peace GUI
 fiio
-equlizerapo
-peacegui
-autodesk fusion
-rustdesk
 konversation
-sunshine
 spotify
-tor
+autodesk fusion
 davinci resolve
  #>
 
