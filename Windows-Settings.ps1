@@ -1072,11 +1072,34 @@ Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSensitivity" -Val
 Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "SmoothMouseXCurve" -Value ([byte[]](0,0,0,0,0,0,0,0,192,204,12,0,0,0,0,0,128,153,25,0,0,0,0,0,64,102,38,0,0,0,0,0))
 Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "SmoothMouseYCurve" -Value ([byte[]](0,0,0,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,112,0,0,0,0,0,0,0,168,0,0,0,0,0,0,0,224,0,0,0,0,0))
 
-
+# Disable Group View in Explorer
+New-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Streams\Settings" -Force | Out-Null; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Streams\Settings" -Name "IsGroupByDefault" -Value 0 -Type DWORD -Force | Out-Null; Stop-Process -Name explorer -Force | Out-Null; Start-Process explorer | Out-Null
 
 # Disable ConfirmFileDelete
 Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "ConfirmFileDelete" -Type DWord -Value 1
 
+# Script to configure "Do not preserve zone information in file attachments" policy
+$RegName = "SaveZoneInformation"
+$RegValue = 1  # 1 = Disabled (Do not preserve zone information)
+
+# Paths for both HKLM and HKCU
+$Paths = @(
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments",
+    "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments"
+)
+
+foreach ($RegPath in $Paths) {
+    # Create registry path if it doesn't exist
+    if (-not (Test-Path $RegPath)) {
+        New-Item -Path $RegPath -Force | Out-Null
+    }
+
+    # Set registry value
+    Set-ItemProperty -Path $RegPath -Name $RegName -Value $RegValue -Type DWORD -Force
+}
+
+# Force Group Policy update
+gpupdate /force
 Write-Host "Done."
 ############################################################################################################################################################
 <# C++ Installation #>
