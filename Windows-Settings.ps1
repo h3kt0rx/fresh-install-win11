@@ -1253,29 +1253,35 @@ Get-AppxPackage -allusers SpotifyAB.SpotifyMusic | Remove-AppxPackage
 Get-AppxPackage -allusers Microsoft.WindowsCommunicationsApps | Remove-AppxPackage
 Get-WindowsPackage -Online | Where PackageName -like *Hello-Face* | Remove-WindowsPackage -Online -NoRestart
 Get-WindowsPackage -Online | Where PackageName -like *QuickAssist* | Remove-WindowsPackage -Online -NoRestart
+ #>
 ############################################################################################################################################################
- Personal Programs
+# Personal Programs
 ############################################################################################################################################################
+Set-ExecutionPolicy Unrestricted
 Write-Output "Installing Chocolatey"
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 choco install chocolatey-core.extension -y
 Write-Output "Installing Personal Applications"
-choco install peazip -y
-choco install vlc -y
-choco install notepadplusplus -y
-choco install thorium -y
-choco install discord -y
+choco install discord.install -y
+choco install notepadplusplus.install -y
+choco install peazip.install -y
+choco install vlc.install -y
 choco install steam -y
-dolby atmos
-syncthing
-Peace GUI
-fiio
-konversation
-spotify
-autodesk fusion
-davinci resolve
- #>
+choco install ddu -y
+choco install tightvnc -y
+choco install rustdesk -y
+Write-Output "Running Spotify Install Script"
+iex "& { $(iwr -useb 'https://raw.githubusercontent.com/SpotX-Official/spotx-official.github.io/main/run.ps1') } -new_theme"
 
+#nvcleaninstall
+#syncthing
+#dolby atmos
+#Peace GUI
+#fiio
+#konversation
+#autodesk fusion
+#davinci resolve
+#kvIRC
  ############################################################################################################################################################
 <# Timer Resolution #>
 ############################################################################################################################################################
